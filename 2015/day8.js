@@ -24,19 +24,17 @@ function partOne(input) {
 
 function partTwo(input) {
 	const totalChars = input.match(totalCharCodesRegex).length;
+	const escapedCharsGroupRegex = /(\\")|(\\\\)|(\\x..)/g;
 
-	// Replace all \\
-
-	// Replace all \"
-	input = input.replace(/\\"/g, `\\\\\\"`);
-
-	// Replace all \x..
-	input = input.replace(/\\(x..)/g, `\\\\$1`);
-
-	// Replace start and end ""
+	input = input.replace(escapedCharsGroupRegex, replacer);
 	input = input.replace(/^"(.*)"$/gm, `"\\"$1\\""`);
 
-	console.log(input);
+	function replacer(_match, g1, g2, g3) {
+		if (g1) return `\\\\\\"`;
+		if (g2) return `\\\\\\\\`;
+		if (g3) return `\\${g3}`;
+	}
+
 	const newTotalChars = input.match(totalCharCodesRegex).length;
 	return newTotalChars - totalChars;
 }
