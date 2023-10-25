@@ -2,7 +2,7 @@
 	"name": "2015",
 	"version": "1.0.0",
 	"description": "",
-	"main": "day6.js",
+	"main": "day9.js",
 	"type": "module",
 	"scripts": {
 		"start": "node --watch day3.js",
