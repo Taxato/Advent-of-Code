@@ -1,10 +1,8 @@
 import { readFile } from "node:fs";
-import { sumArr } from "./helper.js";
+import { create2DArr, sumArr } from "./helper.js";
 readFile("./day6input.txt", { encoding: "ascii" }, processInput);
 
-const lights = Array.from({ length: 1000 }, () =>
-	Array.from({ length: 1000 }, () => 0)
-);
+const lights = create2DArr(1000, 1000, 0);
 
 function processInput(err, raw) {
 	if (err) return err;

@@ -28,3 +28,9 @@ export function timeUsed(start, finish) {
 		}`
 	);
 }
+
+export function create2DArr(cols, rows, fill) {
+	return Array.from({ length: cols }, () =>
+		Array.from({ length: rows }, () => fill)
+	);
+}
