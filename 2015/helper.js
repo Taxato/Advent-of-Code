@@ -16,3 +16,15 @@ export function feedBackOutInFunc(input, func, numTimes) {
 	if (numTimes > 0) return feedBackOutInFunc(result, func, numTimes);
 	return result;
 }
+
+export function timeUsed(start, finish) {
+	const totalMs = finish - start;
+	const seconds = Math.floor(totalMs / 1000);
+	console.log(
+		`Ran in ${
+			seconds
+				? `${seconds}seconds and ${totalMs % 1000}ms`
+				: `${totalMs}ms`
+		}`
+	);
+}
