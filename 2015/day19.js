@@ -47,13 +47,12 @@ function calibrateMachine(input) {
 }
 
 function fabricateMolecule(input) {
-	let currentMolecule = "e";
-	const allUniqueMolecules = [];
-	const replacements = {};
-	input.slice(0, -2).map(rep => {
-		const [_, inp, out] = rep.match(/(\w+) => (\w+)/);
-		if (replacements[inp] === undefined) replacements[inp] = [out];
-		else replacements[inp].push(out);
-	});
-	// console.log(replacements);
+	const inputMolecule = input.at(-1);
+	let goal = "e";
+	const elementCount = inputMolecule.match(/[A-Z][a-z]?/g).length;
+	console.log(elementCount);
+	const parenthCount = inputMolecule.match(/(Rn|Ar)/g).length;
+	const commaCount = inputMolecule.match(/Y/g).length;
+	const solution = elementCount - parenthCount - 2 * commaCount - 1;
+	console.log(solution);
 }

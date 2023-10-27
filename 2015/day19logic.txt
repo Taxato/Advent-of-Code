@@ -42,4 +42,35 @@ e => 54
 e => 71
 e => 86
 
+Rn = (
+Ar = )
+Y = ,
+
+only productions:
+e => XX and X => XX
+X => X(X) | X(X,X) | X(X,X,X)
+
+count = totalNumElements
+each parenth reduces count by 1
+each comma reduces count by 2
+
+
+
 C(3A(2A(4)C29CC24)923ABA(C29296)3A(C6)3AB3A(4)(A(4)CC24)33A(AB33A(6)4,A(4,34)AB3AB929C6)39(A1)9233A(4,AB3(4))33A(92A(4)6,3333AB33A1)33A(92A1)23333AB392AB92923A(4,4)AB3A(4)233A(4,4)AB392AB3A(96)(4)9C239(4)3333A(33A(4,4)4)23AB4)BABA(C(96)4)3AB3923A(24)339(3396)A(4,4)3AB(9296)
+
+formula:
+
+count(tokens) - count('(' or ')') - 2*count(',') - 1
+
+274 elements
+62 parenths
+8 commas
+result = 274 - 62 - 2*8 - 1 = 195
+
+example:
+
+A(B(C,D),E(F,G)) => A(B(C,D),X) => A(X,X) => X
+count("A(B(C,D),E(F,G))") = 16
+count("(()())") = 6
+count(",,,") = 3
+16 - 6 - 2*3 - 1 = 3 steps
