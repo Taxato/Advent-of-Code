@@ -34,3 +34,14 @@ export function create2DArr(cols, rows, fill) {
 		Array.from({ length: rows }, () => fill)
 	);
 }
+
+export function sumProp(arr, prop) {
+	return arr.reduce((sum, val) => {
+		if (!val[prop]) return sum;
+		return sum + +val[prop];
+	}, 0);
+}
+
+export function pipe(fn1, ...fns) {
+	return fns.reduce((prevFn, nextFn) => value => nextFn(prevFn(value)), fn1);
+}
