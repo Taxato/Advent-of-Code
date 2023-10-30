@@ -1,5 +1,3 @@
-import { maxInArr, minInArr } from "./helper.js";
-
 const bossStats = {
 	hp: 51,
 	dmg: 9,
