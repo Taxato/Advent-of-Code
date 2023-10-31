@@ -45,3 +45,7 @@ export function sumProp(arr, prop) {
 export function pipe(fn1, ...fns) {
 	return fns.reduce((prevFn, nextFn) => value => nextFn(prevFn(value)), fn1);
 }
+
+export function arrProduct(arr) {
+	return arr.reduce((product, num) => (product *= num), 1);
+}
