@@ -49,3 +49,15 @@ export function pipe(fn1, ...fns) {
 export function arrProduct(arr) {
 	return arr.reduce((product, num) => (product *= num), 1);
 }
+
+export function manhattanDist(startCoords, endCoords = null) {
+	if (!endCoords) {
+		endCoords = startCoords;
+		startCoords = { x: 0, y: 0 };
+	}
+
+	return (
+		Math.abs(startCoords.x - endCoords.x) +
+		Math.abs(startCoords.y - endCoords.y)
+	);
+}
