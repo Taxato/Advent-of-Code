@@ -35,6 +35,14 @@ export function create2DArr(cols, rows, fill) {
 	);
 }
 
+export function loop2DArr(arr, cb) {
+	for (let col = 0; col < arr.length; col++) {
+		for (let row = 0; row < arr[0].length; row++) {
+			cb(col, row);
+		}
+	}
+}
+
 export function sumProp(arr, prop) {
 	return arr.reduce((sum, val) => {
 		if (!val[prop]) return sum;
