@@ -1,5 +1,5 @@
 import { readFile } from "node:fs";
-import { create2DArr, sumArr } from "./helper.js";
+import { create2DArr, sumArr } from "../helper.js";
 readFile("./day6input.txt", { encoding: "ascii" }, processInput);
 
 const lights = create2DArr(1000, 1000, 0);

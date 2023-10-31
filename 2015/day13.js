@@ -1,5 +1,5 @@
 import { readFile } from "node:fs";
-import { maxInArr } from "./helper.js";
+import { maxInArr } from "../helper.js";
 readFile("./day13input.txt", { encoding: "ascii" }, readInput);
 function readInput(err, raw) {
 	if (err) return err;

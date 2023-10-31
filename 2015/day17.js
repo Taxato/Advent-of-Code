@@ -1,4 +1,4 @@
-import { sumArr, timeUsed } from "./helper.js";
+import { sumArr, timeUsed } from "../helper.js";
 const startTime = Date.now();
 
 const input = [

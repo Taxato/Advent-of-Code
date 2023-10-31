@@ -1,4 +1,4 @@
-import { pipe, sumProp } from "./helper.js";
+import { pipe, sumProp } from "../helper.js";
 
 const spells = [
 	{

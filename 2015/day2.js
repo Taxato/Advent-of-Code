@@ -1,5 +1,4 @@
 import { readFile } from "node:fs";
-import { sumArr } from "./helper.js";
 readFile("./day2input.txt", { encoding: "ascii" }, processInput);
 
 function wrappingPaper([l, w, h]) {

@@ -1,4 +1,4 @@
-import { maxInArr, sumArr, timeUsed } from "./helper.js";
+import { maxInArr, sumArr, timeUsed } from "../helper.js";
 
 const startTime = Date.now();
 

@@ -1,4 +1,4 @@
-import { feedBackOutInFunc } from "./helper.js";
+import { feedBackOutInFunc } from "../helper.js";
 
 const input = "1113122113";
 

@@ -1,5 +1,5 @@
 import { readFile } from "node:fs";
-import { create2DArr, feedBackOutInFunc } from "./helper.js";
+import { create2DArr, feedBackOutInFunc } from "../helper.js";
 
 const testInput = `.#.#.#
 ...##.

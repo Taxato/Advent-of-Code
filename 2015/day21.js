@@ -1,4 +1,4 @@
-import { maxInArr, minInArr } from "./helper.js";
+import { maxInArr, minInArr } from "../helper.js";
 
 const bossStats = {
 	hp: 104,

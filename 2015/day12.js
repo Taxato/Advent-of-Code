@@ -1,5 +1,5 @@
 import input from "./day12input.json" assert { type: "json" };
-import { sumArr } from "./helper.js";
+import { sumArr } from "../helper.js";
 
 let books = Object.entries(input).flat();
 

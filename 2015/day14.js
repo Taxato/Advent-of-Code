@@ -1,4 +1,4 @@
-import { maxInArr } from "./helper.js";
+import { maxInArr } from "../helper.js";
 const input = `Vixen can fly 8 km/s for 8 seconds, but then must rest for 53 seconds.
 Blitzen can fly 13 km/s for 4 seconds, but then must rest for 49 seconds.
 Rudolph can fly 20 km/s for 7 seconds, but then must rest for 132 seconds.

@@ -1,4 +1,4 @@
-import { arrProduct, sumArr } from "./helper.js";
+import { arrProduct, sumArr } from "../helper.js";
 
 const input = [
 	1, 2, 3, 7, 11, 13, 17, 19, 23, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73,
