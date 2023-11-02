@@ -36,3 +36,29 @@ function getRealSum(name) {
 		.join("");
 }
 console.log(idSum);
+
+function decryptRoomName(name, id) {
+	return name
+		.split("")
+		.map(letter => {
+			if (letter === "-") return " ";
+			return shiftLetter(letter, id);
+		})
+		.join("");
+}
+
+function shiftLetter(letter, numShifts) {
+	const alphabet = "abcdefghijklmnopqrstuvwxyz";
+	const letterIndex = alphabet.indexOf(letter);
+	const newLetterIndex = (letterIndex + numShifts) % alphabet.length;
+	return alphabet.charAt(newLetterIndex);
+}
+
+let out = "";
+input.forEach(line => {
+	const parseRegex = /([a-z-]+)(\d+)\[(\w+)\]/;
+	const [_, encrName, id] = line.match(parseRegex);
+
+	if (decryptRoomName(encrName, +id).includes("northpole")) console.log(id);
+	out += `${decryptRoomName(encrName, +id)} ${id}\n`;
+});
