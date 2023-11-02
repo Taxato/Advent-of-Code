@@ -3065,3 +3065,5 @@ export const day4input = [
 	"tpspahyf-nyhkl-kfl-aljouvsvnf-981[flahk]",
 	"bxaxipgn-vgpst-qphzti-rdcipxcbtci-635[ipctx]",
 ];
+
+export const day5input = "uqwqemis";
