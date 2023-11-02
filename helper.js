@@ -43,6 +43,19 @@ export function loop2DArr(arr, cb) {
 	}
 }
 
+export function log2dArr(arr) {
+	let output = "";
+
+	for (let y = 0; y < arr[0].length; y++) {
+		arr.forEach(col => {
+			if (col[y]) output += "#";
+			else output += " ";
+		});
+		output += "\n";
+	}
+	console.log(output);
+}
+
 export function sumProp(arr, prop) {
 	return arr.reduce((sum, val) => {
 		if (!val[prop]) return sum;
