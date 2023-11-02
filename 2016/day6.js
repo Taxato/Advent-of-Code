@@ -13,16 +13,15 @@ input.forEach(line => {
 let partOne = "";
 let partTwo = "";
 chars.forEach(position => {
-	const posVals = Object.values(position);
-	const max = maxInArr(posVals);
-	const maxIndex = posVals.indexOf(max);
-	const mostCommonChar = Object.keys(position)[maxIndex];
-
-	const min = minInArr(posVals);
-	const minIndex = posVals.indexOf(min);
-	const leastCommonChar = Object.keys(position)[minIndex];
-
+	const mostCommonChar = Object.keys(position).reduce((max, cur) =>
+		position[cur] > position[max] ? cur : max
+	);
 	partOne += mostCommonChar;
+
+	const leastCommonChar = Object.keys(position).reduce((min, cur) =>
+		position[cur] < position[min] ? cur : min
+	);
 	partTwo += leastCommonChar;
 });
+
 console.log(partOne, partTwo);
