@@ -43,13 +43,17 @@ export function loop2DArr(arr, cb) {
 	}
 }
 
-export function log2dArr(arr) {
+export function log2dArr(arr, useArrVals) {
 	let output = "";
 
 	for (let y = 0; y < arr[0].length; y++) {
 		arr.forEach(col => {
-			if (col[y]) output += "#";
-			else output += " ";
+			if (useArrVals) {
+				output += col[y];
+			} else {
+				if (col[y]) output += "#";
+				else output += " ";
+			}
 		});
 		output += "\n";
 	}
