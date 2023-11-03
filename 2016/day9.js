@@ -1,18 +1,48 @@
+import { writeFile } from "fs";
+
 import { day9input as input } from "./inputs.js";
 
-for (let i = 0; i < input.length; i++) {
-	const char = input.at(i);
-	if (char === "(") {
-		const match = input.slice(i).match(/(\d+)x(\d+)/);
-		const repLength = +match[1];
-		const repAmount = +match[2];
+function decompress(input) {
+	let len = 0;
+	for (let i = 0; i < input.length; i++) {
+		const char = input.at(i);
+		if (char === "(") {
+			const [_, repLength, repAmount] = input
+				.slice(i)
+				.match(/(\d+)x(\d+)/);
+			if (!repLength || !repAmount) console.log("ERROR");
 
-		const padding = i + repLength + repAmount + 2;
-		const repStr = input.slice(padding, padding + repLength);
-		console.log(repStr, repStr.length);
+			const padding = repLength.length + repAmount.length + 2;
 
-		// index += "2x1)" +
-		// i += repLength + repAmount + 2 + repLength * repAmount;
-		break;
+			len += +repLength * +repAmount;
+			i += padding + +repLength;
+		} else len++;
 	}
+
+	return len;
 }
+
+function recursiveDecompress(input) {
+	let len = 0;
+	for (let i = 0; i < input.length; i++) {
+		const char = input.at(i);
+
+		if (char === "(") {
+			const [op, rawRepLength, repAmount] = input
+				.slice(i)
+				.match(/\((\d+)x(\d+)\)/);
+			const repStr = input.slice(
+				i + op.length,
+				i + op.length + +rawRepLength
+			);
+			len += recursiveDecompress(repStr) * +repAmount;
+			i += op.length + +rawRepLength - 1;
+		} else {
+			len++;
+		}
+	}
+	return len;
+}
+
+console.log("Part 1:", decompress(input));
+console.log("Part 2:", recursiveDecompress(input));
