@@ -92,7 +92,6 @@ export function combinations(iterable, r) {
 	const indices = Array.from({ length: r }, (_, i) => i);
 
 	while (true) {
-		console.log(indices);
 		combos.push(indices.map(i => pool[i]));
 
 		let i;
