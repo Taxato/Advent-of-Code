@@ -82,3 +82,29 @@ export function manhattanDist(startCoords, endCoords = null) {
 		Math.abs(startCoords.y - endCoords.y)
 	);
 }
+
+export function combinations(iterable, r) {
+	const pool = Array.from(iterable);
+	const n = pool.length;
+	if (r > n) return [];
+
+	const combos = [];
+	const indices = Array.from({ length: r }, (_, i) => i);
+
+	while (true) {
+		console.log(indices);
+		combos.push(indices.map(i => pool[i]));
+
+		let i;
+		for (i = r - 1; i >= 0; i--) {
+			if (indices[i] !== i + n - r) break;
+		}
+		if (i < 0) break;
+
+		indices[i]++;
+		for (let j = i + 1; j < r; j++) {
+			indices[j] = indices[j - 1] + 1;
+		}
+	}
+	return combos;
+}
