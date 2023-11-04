@@ -15,6 +15,7 @@ class Item {
 		return this.repr === other.repr;
 	}
 }
+
 class Chip extends Item {}
 class Gen extends Item {}
 
