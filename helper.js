@@ -29,7 +29,7 @@ export function timeUsed(start, finish) {
 	);
 }
 
-export function create2DArr(cols, rows, fill) {
+export function create2DArr(cols, rows, fill = 0) {
 	return Array.from({ length: cols }, () =>
 		Array.from({ length: rows }, () => fill)
 	);
@@ -43,13 +43,19 @@ export function loop2DArr(arr, cb) {
 	}
 }
 
-export function log2dArr(arr) {
+export function log2dArr(arr, logVals = false) {
 	let output = "";
 
 	for (let y = 0; y < arr[0].length; y++) {
 		arr.forEach(col => {
-			if (col[y]) output += "#";
-			else output += " ";
+			if (logVals) {
+				if (col[y] === 1) output += "#";
+				else if (col[y] === 0) output += ".";
+				else output += col[y];
+			} else {
+				if (col[y]) output += "#";
+				else output += ".";
+			}
 		});
 		output += "\n";
 	}
