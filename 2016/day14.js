@@ -35,6 +35,6 @@ function getKeyIndex(salt, keyNum, numHashes = 1) {
 	return keys.at(-1);
 }
 
-// const partOne = getKeyIndex(input, 64);
+const partOne = getKeyIndex(input, 64);
 const partTwo = getKeyIndex(input, 64, 2017);
-console.log(partTwo);
+console.log(partOne, partTwo);
