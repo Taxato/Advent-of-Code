@@ -86,11 +86,8 @@ function run(initialState) {
 	const queue = [initialState];
 	const checkedStates = new Set(initialState.hash);
 
-	let closestDistance = Infinity;
-
 	while (queue.length) {
 		const state = queue.shift();
-
 		if (state.reachedGoal) return state.steps;
 
 		for (const nextState of state.nextStates()) {
@@ -100,7 +97,6 @@ function run(initialState) {
 			}
 		}
 	}
-	console.log(closestDistance);
 }
 
 function distinctLocs(initalState) {
