@@ -9,7 +9,7 @@ function getKeyIndex(salt, keyNum, numHashes = 1) {
 	const candidates = [];
 	const hashes = [];
 
-	for (let i = 0; keys.length < 64; i++) {
+	for (let i = 0; keys.length < keyNum; i++) {
 		let hash = salt + i;
 		for (let j = 0; j < numHashes; j++) {
 			hash = md5(hash);
