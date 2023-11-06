@@ -1,7 +1,5 @@
 import md5 from "md5";
 
-import { feedBackOutInFunc } from "../helper.js";
-
 const input = "ihaygndm";
 
 function getKeyIndex(salt, keyNum, numHashes = 1) {
