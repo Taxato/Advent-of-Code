@@ -29,7 +29,7 @@ export function timeUsed(start, finish) {
 	);
 }
 
-export function create2DArr(cols, rows, fill) {
+export function create2DArr(cols, rows, fill = 0) {
 	return Array.from({ length: cols }, () =>
 		Array.from({ length: rows }, () => fill)
 	);
@@ -43,16 +43,18 @@ export function loop2DArr(arr, cb) {
 	}
 }
 
-export function log2dArr(arr, useArrVals) {
+export function log2dArr(arr, logVals = false) {
 	let output = "";
 
 	for (let y = 0; y < arr[0].length; y++) {
 		arr.forEach(col => {
-			if (useArrVals) {
-				output += col[y];
+			if (logVals) {
+				if (col[y] === 1) output += "#";
+				else if (col[y] === 0) output += ".";
+				else output += col[y];
 			} else {
 				if (col[y]) output += "#";
-				else output += " ";
+				else output += ".";
 			}
 		});
 		output += "\n";
@@ -85,4 +87,29 @@ export function manhattanDist(startCoords, endCoords = null) {
 		Math.abs(startCoords.x - endCoords.x) +
 		Math.abs(startCoords.y - endCoords.y)
 	);
+}
+
+export function combinations(iterable, r) {
+	const pool = Array.from(iterable);
+	const n = pool.length;
+	if (r > n) return [];
+
+	const combos = [];
+	const indices = Array.from({ length: r }, (_, i) => i);
+
+	while (true) {
+		combos.push(indices.map(i => pool[i]));
+
+		let i;
+		for (i = r - 1; i >= 0; i--) {
+			if (indices[i] !== i + n - r) break;
+		}
+		if (i < 0) break;
+
+		indices[i]++;
+		for (let j = i + 1; j < r; j++) {
+			indices[j] = indices[j - 1] + 1;
+		}
+	}
+	return combos;
 }
