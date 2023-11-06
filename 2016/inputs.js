@@ -6140,3 +6140,5 @@ export const day15input = [
 	"Disc #5 has 7 positions; at time=0, it is at position 2.",
 	"Disc #6 has 19 positions; at time=0, it is at position 17.",
 ];
+
+export const day18input = `.^^..^...^..^^.^^^.^^^.^^^^^^.^.^^^^.^^.^^^^^^.^...^......^...^^^..^^^.....^^^^^^^^^....^^...^^^^..^`;
