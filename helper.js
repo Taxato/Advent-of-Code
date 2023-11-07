@@ -121,3 +121,39 @@ export function reverseStr(str) {
 	}
 	return res;
 }
+
+export function permutationsSets(
+	input,
+	choose = input.size,
+	curPerm = new Set(),
+	allPerms = new Set()
+) {
+	if (curPerm.size === choose) allPerms.add(curPerm);
+	const unusedVals = new Set(input);
+	curPerm.forEach(val => unusedVals.delete(val));
+	for (let i = 0; i < unusedVals.size; i++) {
+		const newPerm = new Set(curPerm).add([...unusedVals.values()][i]);
+		permutationsSets(unusedVals, choose, newPerm, allPerms);
+	}
+	return allPerms;
+}
+
+export function permutations(
+	input,
+	choose = input.length,
+	curPerm = [],
+	allPerms = []
+) {
+	if (curPerm.length === choose) allPerms.push(curPerm);
+	const unusedVals = input.filter(el => !curPerm.includes(el));
+	for (let i = 0; i < unusedVals.length; i++) {
+		const newPerm = [...curPerm, unusedVals[i]];
+		permutations(unusedVals, choose, newPerm, allPerms);
+	}
+	return allPerms;
+}
+
+export function factorial(n) {
+	if (n === 1) return 1;
+	return n * factorial(n - 1);
+}
