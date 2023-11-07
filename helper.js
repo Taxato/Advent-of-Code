@@ -122,22 +122,6 @@ export function reverseStr(str) {
 	return res;
 }
 
-export function permutationsSets(
-	input,
-	choose = input.size,
-	curPerm = new Set(),
-	allPerms = new Set()
-) {
-	if (curPerm.size === choose) allPerms.add(curPerm);
-	const unusedVals = new Set(input);
-	curPerm.forEach(val => unusedVals.delete(val));
-	for (let i = 0; i < unusedVals.size; i++) {
-		const newPerm = new Set(curPerm).add([...unusedVals.values()][i]);
-		permutationsSets(unusedVals, choose, newPerm, allPerms);
-	}
-	return allPerms;
-}
-
 export function permutations(
 	input,
 	choose = input.length,
