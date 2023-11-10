@@ -10,26 +10,10 @@ const regs = {
 	d: 0,
 };
 
-const testInstructions = [
-	"cpy 2 a",
-	"tgl a",
-	"tgl a",
-	"tgl a",
-	"cpy 1 a",
-	"dec a",
-	"dec a",
-];
-
 let lineIndex = 0;
 const instructions = [...input];
-let tempInstructions;
 while (lineIndex < instructions.length) {
 	execute(instructions[lineIndex]);
-	// if (lineIndex > 3 && regs.d === 0) break;
-	if (instructions[lineIndex] == "cpy 81 c") {
-		console.log(instructions.join("\n"));
-		break;
-	}
 }
 
 console.log(regs);
@@ -69,12 +53,6 @@ function execute(instruction) {
 			lineIndex++;
 			break;
 	}
-	// console.log(
-	// 	Object.entries(regs)
-	// 		.map(el => el.join(":"))
-	// 		.join(", ")
-	// );
-	// console.log(logInstruction(instruction));
 }
 
 function toggle(index) {
@@ -102,23 +80,6 @@ function toggle(index) {
 			break;
 	}
 	instructions[index] = newInstruction;
-}
-
-function logInstruction(ins) {
-	const [_, op, in1, in2] = ins.match(/(\w+) ([\w\d-]+)? ?([\w\d-]+)?/);
-
-	switch (op) {
-		case "inc":
-			return `Increase register ${in1}`;
-		case "dec":
-			return `Decrease register ${in1}`;
-		case "jnz":
-			return `Jump ${in2} instructions away if ${in1} is not zero`;
-		case "cpy":
-			return `Copy ${in1} into ${in2}`;
-		case "tgl":
-			return `Toggle instruction at ${in1}`;
-	}
 }
 
 const endTime = Date.now();
