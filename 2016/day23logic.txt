@@ -1,0 +1,106 @@
+initial registers : {a:7,b:0,c:0,d:0}
+cpy a b {a:7,b:7,c:0,d:0}
+dec b {a:7,b:6,c:0,d:0}
+
+loop 4: sets a to !a and b,c to 1 and d to 0
+    cpy a d {a:7,b:6,c:0,d:7}
+    cpy 0 a {a:0,b:6,c:0,d:7}
+
+
+    {a:0,b:6,c:0,d:7}
+    loop 2: add b to a d times and set c,d to 0
+        cpy b c {a:0,b:6,c:6,d:7}
+
+        loop 1: add c to a
+            inc a {a:1,b:6,c:6,d:7}
+            dec c {a:1,b:6,c:5,d:7}
+            jnz c -2 repeat a++ until c == 0 {a:6,b:6,c:0,d:7}
+
+        dec d {a:6,b:6,c:0,d:6}
+        jnz d -5 repeat "add c to a" until d == 0
+    {a:42,b:6,c:0,d:0}
+
+    dec b {a:42,b:5,c:0,d:0}
+    cpy b c {a:42,b:5,c:5,d:0}
+    cpy c d {a:42,b:5,c:5,d:5}
+
+    loop 3: add d to c and set d to 0
+        dec d {a:42,b:5,c:5,d:4}
+        inc c {a:42,b:5,c:6,d:4}
+        jnz d -2 repeat inc c d times
+    {a:42,b:5,c:10,d:0}
+
+    tgl c toggle line 10 away -- changes nothing
+
+    cpy -16 c {a:42,b:5,c:-16,d:0}
+    jnz 1 c jump back 16
+
+loop 4 runs reg(a)-2
+
+second runthrough of loop 4:
+{a:42,b:5,c:-16,d:0}
+cpy a d 
+cpy 0 a 
+{a:0,b:5,c:-16,d:42}
+
+loop 2: add b to a d times and set c,d to 0
+    cpy b c 
+    loop 1: add c to a
+        inc a 
+        dec c 
+        jnz c -2 repeat a++ until c == 0 
+    dec d 
+    jnz d -5 repeat "add c to a" until d == 0
+{a:210,b:5,c:0,d:0}
+
+dec b 
+cpy b c 
+cpy c d 
+{a:210,b:4,c:4,d:4}
+loop 3: add d to c and set d to 0
+    dec d 
+    inc c 
+    jnz d -2 repeat inc c d times
+{a:210,b:4,c:8,d:0}
+
+tgl c toggle line 8 away -> inc c becomes dec c
+cpy -16 c 
+jnz 1 c jump back 16
+
+pre-toggle:
+    cpy -16 c 
+    jnz 1 c 
+    cpy 81 c
+    jnz 92 d
+    inc a
+    inc d
+    jnz d -2
+    inc c
+    jnz c -5
+post-toggle:
+    cpy -16 c
+    cpy 1 c
+    cpy 81 c
+    cpy 92 d
+    inc a
+    dec d
+    jnz d -2
+    dec c
+    jnz c -5
+
+{a:5040,b:1,c:1,d:0}
+cpy -16 c
+cpy 1 c
+cpy 81 c
+cpy 92 d
+{a:5040,b:1,c:81,d:92}
+
+loop 5: add d to a
+    inc a
+    dec d
+    jnz d -2
+
+dec c
+jnz c -5
+
+
