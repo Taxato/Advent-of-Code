@@ -104,3 +104,4 @@ dec c
 jnz c -5
 
 
+conclusion: factorial of inital reg a value plus 81*92
