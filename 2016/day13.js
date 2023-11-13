@@ -3,15 +3,15 @@ import { create2DArr, loop2DArr, manhattanDist, sumArr } from "../helper.js";
 const input = 1358;
 
 class State {
-	constructor(currentChoords, visitedChoords, goalChoords, steps) {
-		this.currentChoords = currentChoords;
-		this.visitedChoords = [...visitedChoords, currentChoords];
-		this.goalChoords = goalChoords;
+	constructor(currentCoords, visitedCoords, goalCoords, steps) {
+		this.currentCoords = currentCoords;
+		this.visitedCoords = [...visitedCoords, currentCoords];
+		this.goalCoords = goalCoords;
 		this.steps = steps;
 	}
 
 	get dstToGoal() {
-		return manhattanDist(this.currentChoords, this.goalChoords);
+		return manhattanDist(this.currentCoords, this.goalCoords);
 	}
 
 	get reachedGoal() {
@@ -28,16 +28,16 @@ class State {
 			{ x: 0, y: 1 },
 			{ x: -1, y: 0 },
 		]) {
-			const newX = this.currentChoords.x + dir.x;
-			const newY = this.currentChoords.y + dir.y;
+			const newX = this.currentCoords.x + dir.x;
+			const newY = this.currentCoords.y + dir.y;
 
 			if (
 				newX < 0 ||
 				newX >= building.length ||
 				newY < 0 ||
 				newY >= building[0].length ||
-				this.visitedChoords.some(
-					choords => choords.x === newX && choords.y === newY
+				this.visitedCoords.some(
+					coords => coords.x === newX && coords.y === newY
 				) ||
 				building[newX][newY] === 1
 			)
@@ -51,17 +51,17 @@ class State {
 	generateState({ x, y }) {
 		return new State(
 			{ x, y },
-			this.visitedChoords,
-			this.goalChoords,
+			this.visitedCoords,
+			this.goalCoords,
 			this.steps + 1
 		);
 	}
 
 	get hash() {
 		return `${this.steps}//${Object.values(
-			this.currentChoords
-		)}//${this.visitedChoords
-			.map(choords => Object.values(choords))
+			this.currentCoords
+		)}//${this.visitedCoords
+			.map(coords => Object.values(coords))
 			.join("/")}`;
 	}
 }
@@ -103,7 +103,7 @@ function distinctLocs(initalState) {
 	const queue = [initialState];
 	const checkedStates = new Set(initialState.hash);
 	const allLocs = new Set([
-		JSON.stringify(Object.values(initalState.currentChoords)),
+		JSON.stringify(Object.values(initalState.currentCoords)),
 	]);
 
 	while (queue.length) {
@@ -111,9 +111,7 @@ function distinctLocs(initalState) {
 
 		for (const nextState of state.nextStates()) {
 			if (nextState.steps > 50) continue;
-			allLocs.add(
-				JSON.stringify(Object.values(nextState.currentChoords))
-			);
+			allLocs.add(JSON.stringify(Object.values(nextState.currentCoords)));
 
 			if (!checkedStates.has(nextState.hash)) {
 				queue.push(nextState);
