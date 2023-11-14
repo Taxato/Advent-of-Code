@@ -3,26 +3,6 @@ const startTime = Date.now();
 
 import { day3input as input } from "./inputs.js";
 
-class Spiral {
-	squares = {};
-
-	addSquare(square) {
-		squares[square.hash] = square;
-	}
-}
-
-class Square {
-	constructor(pos, index, val) {
-		this.pos = { ...pos };
-		this.index = index;
-		this.val = val;
-	}
-
-	get hash() {
-		return this.pos.x + "/" + this.pos.y;
-	}
-}
-
 function calcCoords(num) {
 	const pos = { x: 0, y: 0 };
 	const dirs = ["right", "up", "left", "down"];
@@ -54,16 +34,21 @@ function calcCoords(num) {
 	return pos;
 }
 
-function sumSpiral() {
-	let num = 0;
-
+function sumSpiral(target) {
+	const spiral = {};
+	let curVal = 1;
 	const curPos = { x: 0, y: 0 };
 	const dirs = ["right", "up", "left", "down"];
 
 	let numSteps = 1;
 	let dirIndex = 0;
 
-	for (let step = 1; step < num; step++) {
+	spiral[hash(curPos)] = curVal;
+
+	let step = 0;
+	while (true) {
+		step++;
+
 		let dir = dirs[dirIndex % dirs.length];
 		if (step % numSteps === 0) {
 			dirIndex++;
@@ -71,27 +56,50 @@ function sumSpiral() {
 		}
 		switch (dir) {
 			case "right":
-				pos.x += 1;
+				curPos.x += 1;
 				break;
 			case "up":
-				pos.y += 1;
+				curPos.y += 1;
 				break;
 			case "left":
-				pos.x -= 1;
+				curPos.x -= 1;
 				break;
 			case "down":
-				pos.y -= 1;
+				curPos.y -= 1;
 				break;
 		}
-	}
-	return pos;
 
-	if (num > input) return num;
+		curVal = getSumOfNeighbors(curPos);
+		spiral[hash(curPos)] = curVal;
+
+		if (curVal > target) return curVal;
+	}
+
+	function hash(pos) {
+		return `${pos.x}/${pos.y}`;
+	}
+	function getSumOfNeighbors(pos) {
+		let sum = 0;
+		for (const n of [
+			[-1, -1],
+			[0, -1],
+			[1, -1],
+			[-1, 0],
+			[1, 0],
+			[-1, 1],
+			[0, 1],
+			[1, 1],
+		]) {
+			const [xOff, yOff] = n;
+			const nPos = { x: pos.x + xOff, y: pos.y + yOff };
+			if (spiral[hash(nPos)]) sum += spiral[hash(nPos)];
+		}
+		return sum;
+	}
 }
 
-const partOne = manhattanDist(calcCoords(input));
-console.log("Part one:", partOne);
-console.log("Part two:", sumSpiral());
+console.log("Part one:", manhattanDist(calcCoords(input)));
+console.log("Part two:", sumSpiral(input));
 
 const endTime = Date.now();
 timeUsed(startTime, endTime);
