@@ -3,6 +3,9 @@ const startTime = Date.now();
 
 import { day9input as input } from "./inputs.js";
 
+// Already done on the raw input to save space on the inputs.js file
+/*
+const input = removeCancelledChars(day9input);
 function removeCancelledChars(raw) {
 	let input = raw;
 	let i = 0;
@@ -13,6 +16,7 @@ function removeCancelledChars(raw) {
 	}
 	return input;
 }
+*/
 
 function removeGarbage(raw) {
 	let input = raw;
@@ -58,8 +62,8 @@ function partTwo(input) {
 	return totalGarbage;
 }
 
-console.log("Part one:", partOne(removeGarbage(removeCancelledChars(input))));
-console.log("Part two:", partTwo(removeCancelledChars(input)));
+console.log("Part one:", partOne(removeGarbage(input)));
+console.log("Part two:", partTwo(input));
 
 const endTime = Date.now();
 timeUsed(startTime, endTime);
