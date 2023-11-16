@@ -51,7 +51,7 @@ function findCorrectedWeight(input) {
 				.length > 1 &&
 			new Set(p.children.map(c => c.totalWeight)).size === 1
 	);
-	console.log(deviant);
+
 	return (
 		deviant.weight -
 		Math.abs(
