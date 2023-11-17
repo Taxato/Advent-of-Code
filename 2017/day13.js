@@ -12,6 +12,11 @@ class Scanner {
 		this.range = range;
 	}
 
+	willGetCaught(delay) {
+		// caught at delay = if (depth+delay) % ((range-1)*2) === 0
+		return (this.depth + delay) % ((this.range - 1) * 2) === 0;
+	}
+
 	update() {
 		if (this.dir === "down") {
 			this.curLayer++;
@@ -24,7 +29,6 @@ class Scanner {
 }
 
 class State {
-	timePassed = 0;
 	packetPos = -1;
 	severity = 0;
 	scanners = [];
@@ -35,20 +39,25 @@ class State {
 		rangeDepthPairs.forEach(pair => {
 			this.scanners.push(new Scanner(...pair));
 		});
+		this.maxDepth = this.scanners.at(-1).depth;
+	}
+
+	delay(time) {
+		for (let i = 0; i < time; i++) {
+			this.update();
+		}
 	}
 
 	update() {
-		this.timePassed++;
 		if (this.started) {
 			this.packetPos++;
-			if (this.packetPos > this.scanners.at(-1).depth) {
+			if (this.packetPos > this.maxDepth) {
 				this.finished = true;
 				return;
 			}
 		}
 
 		const scanner = this.scanners.find(s => s.depth === this.packetPos);
-
 		if (scanner && scanner.curLayer === 1) {
 			this.severity += scanner.range * scanner.depth;
 		}
@@ -56,33 +65,27 @@ class State {
 			s.update();
 		});
 	}
+
+	willGetCaught(delay) {
+		return this.scanners.some(s => s.willGetCaught(delay));
+	}
+
+	run() {
+		this.started = true;
+		while (!this.finished) {
+			this.update();
+		}
+	}
 }
 
 const partOne = new State(input);
-partOne.started = true;
-while (!partOne.finished) {
-	partOne.update();
-}
+partOne.run();
 console.log("Part one:", partOne.severity);
 
-let delay = 0;
-while (true) {
-	const state = new State(input);
-	for (let i = 0; i < delay; i++) {
-		state.update();
-	}
-	state.started = true;
-	delay++;
-
-	while (!state.finished) {
-		state.update();
-		if (state.severity > 0) break;
-	}
-	if (state.severity === 0) {
-		console.log(delay);
-		break;
-	}
-}
+const state = new State(input);
+let delay = -1;
+while (state.willGetCaught(++delay));
+console.log("Part two:", delay);
 
 const endTime = Date.now();
 timeUsed(startTime, endTime);
