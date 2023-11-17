@@ -1,14 +1,9 @@
 import { timeUsed } from "../helper.js";
 const startTime = Date.now();
 
-const initialGenerators = {
+const initGens = {
 	a: 703,
 	b: 516,
-};
-
-const testGens = {
-	a: 65,
-	b: 8921,
 };
 
 const factors = {
@@ -16,41 +11,35 @@ const factors = {
 	b: 48271,
 };
 
-function next(gens) {
-	// return {
-	// 	a: ((gens.a & 65535) * factors.a) & 65535,
-	// 	b: ((gens.b & 65535) * factors.b) & 65535,
-	// };
-	return {
-		a: (gens.a * factors.a) & 65535,
-		b: (gens.b * factors.b) & 65535,
-	};
+function matchPairs(gens, factors, reps, bitRems = null) {
+	let numPairs = 0;
+
+	function next(gens) {
+		let a = gens.a;
+		let b = gens.b;
+		do {
+			a = (a * factors.a) % 2147483647;
+		} while (bitRems === null ? false : a & bitRems.a);
+		do {
+			b = (b * factors.b) % 2147483647;
+		} while (bitRems === null ? false : b & bitRems.b);
+
+		return { a, b };
+	}
+
+	const match = gens => (gens.a & 0xffff) === (gens.b & 0xffff);
+
+	for (let i = 0; i < reps; i++) {
+		gens = next(gens);
+		if (match(gens)) numPairs++;
+	}
+	return numPairs;
 }
 
-function match(gens) {
-	// const aBits = gens.a.toString(2).slice(-16);
-	// const bBits = gens.b.toString(2).slice(-16);
-	// return aBits === bBits;
-	return gens.a === gens.b;
-}
-
-// Part one
-let numPairs = 0;
-let gens = next(testGens);
-for (let i = 0; i < 40_000_000; i++) {
-	if (match(gens)) numPairs++;
-	gens = next(gens);
-}
-console.log("Part one:", numPairs);
-
-// Part two
-// let numPairs = 0;
-// let gens = next(initialGenerators);
-// for (let i = 0; i < 5_000_000; i++) {
-// 	if (matchPartTwo(gens)) numPairs++;
-// 	gens = next(gens);
-// }
-// console.log("Part two:", numPairs);
+const partOne = matchPairs(initGens, factors, 4e7);
+const partTwo = matchPairs(initGens, factors, 5e6, { a: 3, b: 7 });
+console.log("Part one:", partOne);
+console.log("Part two:", partTwo);
 
 const endTime = Date.now();
 timeUsed(startTime, endTime);
