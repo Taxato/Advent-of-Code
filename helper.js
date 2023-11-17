@@ -145,3 +145,243 @@ export function factorial(n) {
 export function asciiArrFromStr(str) {
 	return str.split("").map(char => char.charCodeAt(0));
 }
+
+export function singleKnotHash({
+	listLength,
+	instructions,
+	curPos = 0,
+	skipSize = 0,
+	list = Array.from({ length: listLength }, (_, i) => i),
+}) {
+	for (const length of instructions) {
+		const section = [];
+		for (let i = curPos; i < curPos + length; i++) {
+			section.push({
+				val: list.at(i % list.length),
+				pos: i % list.length,
+			});
+		}
+
+		const reverseOrder = section.map(item => item.pos).reverse();
+		const reversedSection = section.map((item, i) => ({
+			...item,
+			pos: reverseOrder[i],
+		}));
+		reversedSection.forEach(item => {
+			list[item.pos] = item.val;
+		});
+		curPos = (curPos + length + skipSize) % list.length;
+		skipSize++;
+	}
+
+	return {
+		list,
+		listLength,
+		instructions,
+		curPos,
+		skipSize,
+		result: list[0] * list[1],
+	};
+}
+
+export function knotHash(input) {
+	const sequence = [...asciiArrFromStr(input), 17, 31, 73, 47, 23];
+	const result = feedBackOutInFunc(
+		{ listLength: 256, instructions: sequence },
+		singleKnotHash,
+		64
+	);
+	const sparseHash = result.list;
+	const blocks = [];
+	for (let i = 0; i < 16; i++) {
+		blocks.push(sparseHash.slice(i * 16, (i + 1) * 16));
+	}
+	const denseHash = blocks.map(block =>
+		block.reduce((res, cur) => res ^ cur)
+	);
+
+	return denseHash.map(num => num.toString(16).padStart(2, "0")).join("");
+}
+
+export class GridState {
+	constructor(
+		grid,
+		currentCoords,
+		goalCoords = null,
+		visitedCoords = [],
+		steps = 0
+	) {
+		this.grid = grid;
+		this.currentCoords = currentCoords;
+		this.goalCoords = goalCoords;
+		this.visitedCoords = [...visitedCoords, currentCoords];
+		this.steps = steps;
+	}
+
+	get dstToGoal() {
+		if (!this.goalCoords) return null;
+		return manhattanDist(this.currentCoords, this.goalCoords);
+	}
+
+	get reachedGoal() {
+		if (!this.goalCoords) return null;
+		return this.dstToGoal === 0;
+	}
+
+	nextStates() {
+		const newStates = [];
+
+		for (const dir of [
+			{ x: 0, y: -1 },
+			{ x: 1, y: 0 },
+			{ x: 0, y: 1 },
+			{ x: -1, y: 0 },
+		]) {
+			const newX = this.currentCoords.x + dir.x;
+			const newY = this.currentCoords.y + dir.y;
+
+			if (
+				newX < 0 ||
+				newX >= this.grid.length ||
+				newY < 0 ||
+				newY >= this.grid[0].length ||
+				this.visitedCoords.some(
+					coords => coords.x === newX && coords.y === newY
+				) ||
+				this.grid[newX][newY] === 1
+			)
+				continue;
+
+			newStates.push(this.generateState([newX, newY]));
+		}
+		return newStates;
+	}
+
+	generateState([x, y]) {
+		return new GridState(
+			this.grid,
+			{ x, y },
+			this.goalCoords,
+			this.visitedCoords,
+			this.steps + 1
+		);
+	}
+}
+
+export class Grid {
+	constructor(cols, rows) {
+		this.grid = create2DArr(cols, rows);
+	}
+
+	get totalOn() {
+		return sumArr(this.grid.flat());
+	}
+
+	test() {
+		return this.neighbors(this.neighbors({ x: 0, y: 0 })[0]);
+	}
+
+	neighbors(pos) {
+		const neighbors = [];
+
+		for (const dir of [
+			{ x: 0, y: -1 },
+			{ x: 1, y: 0 },
+			{ x: 0, y: 1 },
+			{ x: -1, y: 0 },
+		]) {
+			const nX = pos.x + dir.x;
+			const nY = pos.y + dir.y;
+
+			if (
+				nX < 0 ||
+				nX >= this.grid.length ||
+				nY < 0 ||
+				nY >= this.grid[0].length
+			)
+				continue;
+
+			neighbors.push({ x: nX, y: nY });
+		}
+		return neighbors;
+	}
+
+	get numRegions() {
+		let regions = 0;
+		let visited = new Set();
+		const key = pos => `${pos.x}/${pos.y}`;
+
+		for (let x = 0; x < this.grid.length; x++) {
+			for (let y = 0; y < this.grid[0].length; y++) {
+				if (this.grid[x][y] === 0) continue;
+				else if (visited.has(key({ x, y }))) {
+					continue;
+				} else {
+					regions++;
+					const queue = [{ x, y }];
+					while (queue.length) {
+						const pos = queue.shift();
+						for (const neighbor of this.neighbors(pos)) {
+							const n = this.grid[neighbor.x][neighbor.y];
+							if (n === 0) continue;
+							const nKey = key(neighbor);
+							if (!visited.has(nKey)) {
+								visited.add(nKey);
+								queue.push(neighbor);
+							}
+						}
+					}
+				}
+			}
+		}
+		return regions;
+	}
+
+	pathFind(start, end) {
+		const initialState = new GridState(this.grid, start, end);
+		const queue = [initialState];
+		const visited = new Set(
+			JSON.stringify(Object.values(initialState.currentCoords))
+		);
+
+		while (queue.length) {
+			const state = queue.shift();
+			if (state.reachedGoal) return state.steps;
+
+			for (const nextState of state.nextStates()) {
+				const nextStateKey = JSON.stringify(
+					Object.values(nextState.currentCoords)
+				);
+				if (!visited.has(nextStateKey)) {
+					queue.push(nextState);
+					visited.add(nextStateKey);
+				}
+			}
+		}
+	}
+
+	distinctLocs(start, maxSteps) {
+		const initialState = new GridState(this.grid, start);
+		const queue = [initialState];
+		const allLocs = new Set([
+			JSON.stringify(Object.values(initialState.currentCoords)),
+		]);
+
+		while (queue.length) {
+			const state = queue.shift();
+
+			for (const nextState of state.nextStates()) {
+				const nextStateKey = JSON.stringify(
+					Object.values(nextState.currentCoords)
+				);
+				if (nextState.steps > maxSteps) continue;
+
+				if (!allLocs.has(nextStateKey)) {
+					queue.push(nextState);
+					allLocs.add(nextStateKey);
+				}
+			}
+		}
+		return allLocs.size;
+	}
+}
