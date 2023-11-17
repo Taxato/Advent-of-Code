@@ -17,13 +17,17 @@ function matchPairs(gens, factors, reps, bitRems = null) {
 	function next(gens) {
 		let a = gens.a;
 		let b = gens.b;
-		do {
+		if (bitRems !== null) {
+			do {
+				a = (a * factors.a) % 2147483647;
+			} while (a & bitRems.a);
+			do {
+				b = (b * factors.b) % 2147483647;
+			} while (b & bitRems.b);
+		} else {
 			a = (a * factors.a) % 2147483647;
-		} while (bitRems === null ? false : a & bitRems.a);
-		do {
 			b = (b * factors.b) % 2147483647;
-		} while (bitRems === null ? false : b & bitRems.b);
-
+		}
 		return { a, b };
 	}
 
