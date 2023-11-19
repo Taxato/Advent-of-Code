@@ -1,11 +1,4 @@
-import {
-	Grid,
-	create2DArr,
-	knotHash,
-	loop2DArr,
-	sumArr,
-	timeUsed,
-} from "../helper.js";
+import { Grid, knotHash, timeUsed } from "../helper.js";
 
 const startTime = Date.now();
 
