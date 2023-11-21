@@ -1,5 +1,5 @@
 import { day8input as input } from "./inputs.js";
-import { create2DArr, log2dArr, sumArr } from "../helper.js";
+import { create2DArr, log2DArr, sumArr } from "../helper.js";
 
 const screen = create2DArr(50, 6, 0);
 
@@ -41,5 +41,5 @@ function parseInstruction(instruction) {
 
 input.forEach(line => parseInstruction(line));
 
-log2dArr(screen);
+log2DArr(screen);
 console.log(sumArr(screen.flat()));

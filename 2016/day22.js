@@ -1,4 +1,4 @@
-import { create2DArr, log2dArr, loop2DArr, timeUsed } from "../helper.js";
+import { create2DArr, log2DArr, loop2DArr, timeUsed } from "../helper.js";
 const startTime = Date.now();
 
 import { day22input as input } from "./inputs.js";
@@ -159,7 +159,7 @@ testState.setTargetNode();
 // 	output = output.padEnd(5, " ");
 // 	testGrid[x][y] = output;
 // });
-// log2dArr(testGrid, true);
+// log2DArr(testGrid, true);
 
 const grid = create2DArr(34, 31, null);
 initalState.setTargetNode();
@@ -176,7 +176,7 @@ for (const node of initalState.nodes) {
 	output = output.padEnd(3, " ");
 	grid[x][y] = output;
 }
-log2dArr(grid, true);
+log2DArr(grid, true);
 
 const endTime = Date.now();
 timeUsed(startTime, endTime);
