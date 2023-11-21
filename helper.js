@@ -277,10 +277,6 @@ export class Grid {
 		return sumArr(this.grid.flat());
 	}
 
-	test() {
-		return this.neighbors(this.neighbors({ x: 0, y: 0 })[0]);
-	}
-
 	neighbors(pos) {
 		const neighbors = [];
 
