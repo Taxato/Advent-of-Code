@@ -62,7 +62,32 @@ export function log2DArr(arr, logVals = false) {
 	console.log(output);
 }
 
-export function rotate2DArr(arr, times = 1) {}
+export function rotate2DArr(arr, times = 1) {
+	for (let i = 0; i < times; i++) {
+		rotate(arr);
+	}
+	return arr;
+
+	function rotate(arr) {
+		const oldArr = arr.map(col => [...col]);
+		loop2DArr(oldArr, (col, row) => {
+			arr[oldArr[0].length - 1 - row][col] = oldArr[col][row];
+		});
+	}
+}
+
+export function flip2DArr(arr, axis = "x") {
+	const oldArr = arr.map(col => [...col]);
+	if (axis === "x") {
+		loop2DArr(oldArr, (col, row) => {
+			arr[oldArr.length - 1 - col][row] = oldArr[col][row];
+		});
+	} else {
+		loop2DArr(oldArr, (col, row) => {
+			arr[col][oldArr[0].length - 1 - row] = oldArr[col][row];
+		});
+	}
+}
 
 export function sumProp(arr, prop) {
 	return arr.reduce((sum, val) => {
