@@ -1,30 +1,7 @@
-import { Grid, create2DArr, log2dArr, loop2DArr, timeUsed } from "../helper.js";
+import { create2DArr, loop2DArr, timeUsed } from "../helper.js";
 const startTime = Date.now();
 
 import { day19input as input } from "./inputs.js";
-
-/* class State {
-	dirs = ["up,down,right,left"];
-
-	constructor(maze, pos, dir, steps, letters) {
-		this.maze = maze;
-		this.pos = { ...pos };
-		this.dir = dir;
-		this.steps = steps;
-		this.letters = letters;
-	}
-
-	step() {
-		const char = this.maze.grid[this.pos.x][this.pos.y];
-
-		let nextPos;
-		("|-+");
-		switch (char) {
-			case "|":
-		}
-		return nextPos;
-	}
-} */
 
 const maze = create2DArr(input[0].length, input.length);
 loop2DArr(maze, (col, row) => {
