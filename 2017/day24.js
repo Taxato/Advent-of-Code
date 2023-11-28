@@ -3,42 +3,49 @@ const startTime = Date.now();
 
 import { day24input as input } from "./inputs.js";
 
-// const input = ["0/1", "0/2", "2/2", "2/3", "3/5", "3/4", "1/10", "9/10"];
-
-const components = input.map(line => {
+const allPieces = input.map(line => {
 	const [_, a, b] = line.match(/(\d+)\/(\d+)/);
-
 	return [+a, +b];
 });
 
-let allBridges = [];
-let maxStrength = 0;
-let strongestBridge;
-const starters = components.filter(c => c.includes(0));
-starters.forEach(s => getBridges([s], s[1]));
+function getBridges(
+	pieces,
+	bridge = { strength: 0, length: 0 },
+	connector = 0
+) {
+	let bridges = [];
 
-function getBridges(bridge, curPort) {
-	const validComps = components.filter(
-		c => !bridge.includes(c) && c.includes(curPort)
-	);
-	if (validComps.length === 0) {
-		allBridges.push(bridge);
-		const strength = sumArr(bridge.flat());
-		if (strength > maxStrength) {
-			strongestBridge = bridge;
-			maxStrength = strength;
-		}
-	} else {
-		for (const next of validComps) {
-			const newBridge = [...bridge, next];
-			const newPort = next.find(p => p !== curPort);
-			getBridges(newBridge, newPort);
+	for (const piece of pieces) {
+		if (piece.includes(connector)) {
+			const newBridge = {
+				strength: bridge.strength + sumArr(piece),
+				length: bridge.length + 1,
+			};
+
+			bridges.push(newBridge);
+			const piecesLeft = pieces.filter(p => p !== piece);
+			const newConnector = piece[0] === connector ? piece[1] : piece[0];
+
+			bridges = bridges.concat(
+				getBridges(piecesLeft, newBridge, newConnector)
+			);
 		}
 	}
+
+	return bridges;
 }
+const allBridges = getBridges(allPieces);
+
+const maxStrength = allBridges.sort((a, b) => b.strength - a.strength)[0]
+	.strength;
+
+const strongestLongest = allBridges
+	.sort((a, b) => b.length - a.length)
+	.filter((b, _i, arr) => b.length === arr[0].length)
+	.sort((a, b) => b.strength - a.strength)[0].strength;
 
 console.log("Part one:", maxStrength);
-console.log(allBridges.length);
+console.log("Part two:", strongestLongest);
 
 const endTime = Date.now();
 timeUsed(startTime, endTime);
