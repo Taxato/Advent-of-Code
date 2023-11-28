@@ -45,7 +45,36 @@ while (true) {
 	if (lineIndex < 0 || lineIndex >= input.length) break;
 }
 
+function partTwo() {
+	const regs = {
+		b: 67,
+		c: 67,
+		d: 0,
+		f: 0,
+		g: 0,
+		h: 0,
+	};
+	regs.b = regs.b * 100 + 100000;
+	regs.c = regs.b + 17000;
+	do {
+		regs.f = 1;
+		regs.d = 2;
+		for (let d = regs.d; d * d < regs.b; d++) {
+			if (regs.b % d === 0) {
+				regs.f = 0;
+				break;
+			}
+		}
+		if (regs.f === 0) regs.h++;
+		regs.g = regs.b - regs.c;
+		regs.b += 17;
+	} while (regs.g !== 0);
+
+	return regs.h;
+}
+
 console.log("Part one:", numMul);
+console.log("Part two:", partTwo());
 
 const endTime = Date.now();
 timeUsed(startTime, endTime);
