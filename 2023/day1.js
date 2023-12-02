@@ -1,7 +1,7 @@
 import { timeUsed } from "../helper.js";
 const startTime = Date.now();
 
-import { day1input as input } from "./input.js";
+import { day1input as input } from "./inputs.js";
 
 function calibrate(input) {
 	return input
