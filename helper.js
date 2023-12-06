@@ -29,6 +29,11 @@ export function timeUsed(start, finish) {
 	);
 }
 
+export function time(start) {
+	const end = process.hrtime(start);
+	console.log(`Execution time: ${end[0] * 1000 + end[1] / 1000000}ms`);
+}
+
 export function create2DArr(cols, rows, fill = 0) {
 	return Array.from({ length: cols }, () =>
 		Array.from({ length: rows }, () => fill)
