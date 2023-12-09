@@ -35,7 +35,7 @@ for (const bid of bids) {
 		bid.cards[c] = c in bid.cards ? bid.cards[c] + 1 : 1;
 	}
 	bid.cards = Object.entries(bid.cards).sort((a, b) => b[1] - a[1]);
-	console.log(bid.cards);
+	// console.log(bid.cards);
 	if (bid.cards.length > 0) {
 		bid.cards[0][1] += jokers;
 	} else {
@@ -58,7 +58,7 @@ bids.sort((a, b) => {
 	else return vals.indexOf(a.hand.charAt(4)) - vals.indexOf(b.hand.charAt(4));
 });
 
-console.log(bids.map(b => [b.hand, b.bid, ...b.cards.map(c => c[0])]));
+// console.log(bids.map(b => [b.hand, b.bid, ...b.cards.map(c => c[0])]));
 
 console.log(bids.reduce((sum, cur, i) => sum + cur.bid * (i + 1), 0));
 time(startTime);
