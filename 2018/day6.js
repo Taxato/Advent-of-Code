@@ -1,179 +1,52 @@
-import {
-	create2DArr,
-	log2DArr,
-	loop2DArr,
-	manhattanDist,
-	minInArr,
-	timeUsed,
-} from "../helper.js";
-const startTime = Date.now();
+import { readFileSync } from "fs";
+import { create2DArr, loop2DArr, manhattanDist, time } from "../helper.js";
+const startTime = process.hrtime();
 
-import { day6input as input } from "./inputs.js";
-// const input = [
-// 	[1, 1],
-// 	[1, 6],
-// 	[8, 3],
-// 	[3, 4],
-// 	[5, 5],
-// 	[8, 9],
-// ];
+const input = readFileSync("./day6input.txt", { encoding: "utf8" });
+// const input = readFileSync("./day6test.txt", { encoding: "utf8" });
 
-const coords = input.map((pos, i) => ({ i, x: pos[0], y: pos[1] }));
+const points = input
+	.split("\n")
+	.map(l => l.split(", ").map(Number))
+	.map((p, i) => ({ i, x: p[0], y: p[1] }));
 
-const grid = create2DArr(2000, 2000);
+const a1 = getAreas(1000);
+const a2 = getAreas(1400);
 
-// for (const point of coords) {
-// 	grid[point.x][point.y] = point.i;
-// }
+const a1Keys = new Set(Object.entries(a1).map(a => a[0] + "/" + a[1]));
+const a2Keys = new Set(Object.entries(a2).map(a => a[0] + "/" + a[1]));
 
-function closestPoint(pos) {
-	let allDsts = [];
-	let shortestDst = Infinity;
-	let closestPoint;
+const same = new Set();
+a1Keys.forEach(k => {
+	if (a2Keys.has(k)) same.add(k);
+});
+console.log(
+	[...same].reduce((maxA, curK) => {
+		const num = +curK.split("/")[1];
+		return num > maxA ? num : maxA;
+	}, 0)
+);
 
-	coords.forEach(point => {
-		const dst = manhattanDist(pos, point);
-		if (dst < shortestDst) {
-			shortestDst = dst;
-			closestPoint = point;
-		}
-		allDsts.push({ point: point.i, dst });
-	});
+function getAreas(size) {
+	const areas = {};
+	points.forEach(p => (areas[p.i] = 0));
 
-	let duplicates = false;
-	for (let i = 0; i < allDsts.length; i++) {
-		for (let j = 0; j < allDsts.length; j++) {
-			if (i === j) continue;
-			if (allDsts[i].dst === allDsts[j].dst) duplicates = true;
+	for (let y = 0; y < size; y++) {
+		for (let x = 0; x < size; x++) {
+			let dstToPoints = [];
+			for (const p of points) {
+				dstToPoints.push({ i: p.i, dst: manhattanDist({ x, y }, p) });
+			}
+
+			const lowestDst = dstToPoints.reduce(
+				(min, cur) => (cur.dst < min ? cur.dst : min),
+				Infinity
+			);
+			const closestPoints = dstToPoints.filter(p => p.dst === lowestDst);
+			if (closestPoints.length === 1) areas[closestPoints[0].i]++;
 		}
 	}
-
-	return duplicates ? "." : closestPoint.i;
+	return areas;
 }
 
-loop2DArr(grid, (x, y) => {
-	grid[x][y] = closestPoint({ x, y });
-});
-
-// log2DArr(grid, true);
-
-let areas = {};
-for (const point of grid.flat()) {
-	if (!(point in areas)) areas[point] = 1;
-	else areas[point]++;
-}
-const sortedAreas = Object.entries(areas).sort((a, b) => b[1] - a[1]);
-console.log(sortedAreas);
-
-console.log("Part one:");
-
-const endTime = Date.now();
-timeUsed(startTime, endTime);
-
-[
-	[".", 958733],
-	["5", 16967],
-	["16", 15286],
-	["12", 2514],
-	["8", 2191],
-	["0", 765],
-	["29", 389],
-	["9", 380],
-	["39", 305],
-	["30", 260],
-	["17", 258],
-	["24", 243],
-	["14", 228],
-	["22", 146],
-	["11", 137],
-	["1", 134],
-	["47", 114],
-	["27", 106],
-	["26", 98],
-	["13", 96],
-	["44", 96],
-	["41", 88],
-	["6", 87],
-	["10", 77],
-	["31", 68],
-	["33", 58],
-	["25", 44],
-	["43", 41],
-	["7", 37],
-	["32", 22],
-	["3", 18],
-	["15", 12],
-	["40", 2],
-];
-
-[
-	[".", 2180733],
-	["5", 29967],
-	["16", 26786],
-	["12", 4014],
-	["8", 3691],
-	["0", 1265],
-	["29", 389],
-	["9", 380],
-	["39", 305],
-	["30", 260],
-	["17", 258],
-	["24", 243],
-	["14", 228],
-	["22", 146],
-	["11", 137],
-	["1", 134],
-	["47", 114],
-	["27", 106],
-	["26", 98],
-	["13", 96],
-	["44", 96],
-	["41", 88],
-	["6", 87],
-	["10", 77],
-	["31", 68],
-	["33", 58],
-	["25", 44],
-	["43", 41],
-	["7", 37],
-	["32", 22],
-	["3", 18],
-	["15", 12],
-	["40", 2],
-];
-
-[
-	[".", 3902733],
-	["5", 42967],
-	["16", 38286],
-	["12", 5514],
-	["8", 5191],
-	["0", 1765],
-	["29", 389],
-	["9", 380],
-	["39", 305],
-	["30", 260],
-	["17", 258],
-	["24", 243],
-	["14", 228],
-	["22", 146],
-	["11", 137],
-	["1", 134],
-	["47", 114],
-	["27", 106],
-	["26", 98],
-	["13", 96],
-	["44", 96],
-	["41", 88],
-	["6", 87],
-	["10", 77],
-	["31", 68],
-	["33", 58],
-	["25", 44],
-	["43", 41],
-	["7", 37],
-	["32", 22],
-	["3", 18],
-	["15", 12],
-	["40", 2],
-];
+time(startTime);
