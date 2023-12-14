@@ -584,8 +584,6 @@ export class LinkedList {
 		this.head = prevNode;
 		return this;
 	}
-
-	// [1,2,3] = [3,2,1]
 }
 
 export class CircularLinkedList {
