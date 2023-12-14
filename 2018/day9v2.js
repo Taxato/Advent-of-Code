@@ -10,6 +10,7 @@ list.prepend(30);
 list.prepend(35);
 list.append(40);
 console.log(list.toArray());
+console.log(list.reverse().toArray());
 console.log(list.traverseToIndex(1));
 
 time(startTime);

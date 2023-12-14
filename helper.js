@@ -573,9 +573,16 @@ export class LinkedList {
 		let curNode = this.head;
 		let nextNode = null;
 
-		while (curNode) {
+		while (curNode !== null) {
+			nextNode = curNode.next;
+			curNode.next = prevNode;
 			prevNode = curNode;
+			curNode = nextNode;
 		}
+
+		this.tail = this.head;
+		this.head = prevNode;
+		return this;
 	}
 
 	// [1,2,3] = [3,2,1]
