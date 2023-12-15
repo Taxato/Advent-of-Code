@@ -423,9 +423,10 @@ export class Grid {
 }
 
 export class Node {
-	constructor(val, next = null) {
+	constructor(val) {
 		this.val = val;
-		this.next = next;
+		this.next = null;
+		this.prev = null;
 	}
 }
 
@@ -435,13 +436,13 @@ export class LinkedList {
 	length = 0;
 
 	constructor(val) {
-		if (val) this.append(val);
+		if (val !== undefined) this.append(val);
 	}
 
 	append(val) {
 		const newNode = new Node(val);
 
-		if (!this.head) {
+		if (this.length === 0) {
 			this.head = newNode;
 			this.tail = newNode;
 		} else {
@@ -449,14 +450,16 @@ export class LinkedList {
 			this.tail = newNode;
 		}
 		this.length++;
+		return this;
 	}
 
 	prepend(val) {
 		const newNode = new Node(val);
 
-		newNode.next = this.head;
+		if (this.length > 0) newNode.next = this.head;
 		this.head = newNode;
 		this.length++;
+		return this;
 	}
 
 	toArray() {
@@ -503,45 +506,36 @@ export class LinkedList {
 	}
 
 	deleteHead() {
-		if (!this.head) return "List is empty";
+		if (this.length === 0) return "List is empty";
 
 		const headVal = this.head.val;
 
-		if (this.head === this.tail) {
+		if (this.length === 1) {
 			this.head = null;
 			this.tail = null;
-			this.length--;
-			return this;
+		} else {
+			const newHead = this.head.next;
+			this.head = newHead;
 		}
 
-		const newHead = this.head.next;
-		this.head = newHead;
 		this.length--;
-
 		return headVal;
 	}
 
 	deleteTail() {
-		if (!this.head) return "List is empty";
+		if (this.length === 0) return "List is empty";
 
 		const tailVal = this.tail.val;
 
-		if (this.head === this.tail) {
+		if (this.length === 1) {
 			this.head = null;
 			this.tail = null;
-			this.length--;
-			return tailVal;
+		} else {
+			const newTail = this.traverseToIndex(this.length - 2);
+			newTail.next = null;
+			this.tail = newTail;
 		}
 
-		let curNode = this.head;
-		while (curNode.next) {
-			if (!curNode.next.next) {
-				curNode.next = null;
-			} else {
-				curNode = curNode.next;
-			}
-		}
-		this.tail = curNode;
 		this.length--;
 		return tailVal;
 	}
@@ -586,39 +580,512 @@ export class LinkedList {
 	}
 }
 
-export class CircularLinkedList {
-	head = null;
-	tail = null;
-	length = 0;
-
+export class DoublyLinkedList {
 	constructor(val) {
-		if (val) this.initalize(val);
+		this.head = null;
+		this.tail = null;
+		this.length = 0;
+
+		if (val !== undefined) this.append(val);
 	}
 
-	initalize(val) {
+	append(val) {
+		const newNode = new Node(val);
+
+		if (this.length === 0) {
+			this.head = newNode;
+			this.tail = newNode;
+		} else {
+			newNode.prev = this.tail;
+			this.tail.next = newNode;
+			this.tail = newNode;
+		}
+		this.length++;
+		return this;
+	}
+
+	prepend(val) {
+		const newNode = new Node(val);
+
+		if (this.length === 0) {
+			this.head = newNode;
+			this.tail = newNode;
+		} else {
+			newNode.next = this.head;
+			this.head.prev = newNode;
+			this.head = newNode;
+		}
+		this.length++;
+		return this;
+	}
+
+	toArray() {
+		const arr = [];
+
+		let curNode = this.head;
+
+		while (curNode !== null) {
+			arr.push(curNode.val);
+			curNode = curNode.next;
+		}
+		return arr;
+	}
+
+	traverseToIndex(index) {
+		if (typeof index !== "number") return "Index should be a number";
+		if (index >= this.length) return this.tail;
+		if (index < -this.length) return this.head;
+		if (index === 0) return this.head;
+
+		let counter;
+		let curNode;
+		if (index > 0) {
+			curNode = this.head;
+			counter = 0;
+
+			while (counter !== index) {
+				curNode = curNode.next;
+				counter++;
+			}
+		} else {
+			// Reverse traversal
+			curNode = this.tail;
+			counter = index + 1;
+
+			while (counter !== 0) {
+				curNode = curNode.prev;
+				counter++;
+			}
+		}
+		return curNode;
+	}
+
+	insert(val, index) {
+		if (typeof index !== "number") return "Index should be a number";
+		if (index < 0) return "Index should be greater or equal to zero";
+
+		if (index > this.length) return this.append(val);
+		if (index === 0) return this.prepend(val);
+
+		const newNode = new Node(val);
+
+		const preIdx = this.traverseToIndex(index - 1);
+		const targetIdx = preIdx.next;
+
+		preIdx.next = newNode;
+		newNode.prev = preIdx;
+		newNode.next = targetIdx;
+		targetIdx.prev = newNode;
+
+		this.length++;
+		return this;
+	}
+
+	deleteHead() {
+		if (this.length === 0) return "List is empty";
+
+		const headVal = this.head.val;
+		if (this.length === 1) {
+			this.head = null;
+			this.tail = null;
+		} else {
+			const newHead = this.head.next;
+			newHead.prev = null;
+			this.head = newHead;
+		}
+		this.length--;
+		return headVal;
+	}
+
+	deleteTail() {
+		if (this.length === 0) return "List is empty";
+
+		const tailVal = this.tail.val;
+		if (this.length === 1) {
+			this.head = null;
+			this.tail = null;
+		} else {
+			const newTail = this.tail.prev;
+			newTail.next = null;
+			this.tail = newTail;
+		}
+		this.length--;
+		return tailVal;
+	}
+
+	delete(index) {
+		if (this.length === 0) return "List is empty";
+		if (typeof index !== "number") return "Index should be a number";
+		if (index < 0) return "Index should be greater or equal to zero";
+
+		if (index >= this.length) return this.deleteTail();
+		if (index === 0 || this.length === 1) return this.deleteHead();
+
+		const preIdx = this.traverseToIndex(index - 1);
+		const targetIdx = preIdx.next;
+		const targetVal = targetIdx.val;
+		const nextIdx = targetIdx.next;
+		preIdx.next = nextIdx;
+		nextIdx.prev = preIdx;
+
+		this.length--;
+		return targetVal;
+	}
+
+	reverse() {
+		if (this.length <= 1) return this;
+
+		let curNode = this.head;
+		let prevNode = null;
+		let nextNode = null;
+
+		while (curNode) {
+			nextNode = curNode.next;
+
+			curNode.next = prevNode;
+			curNode.prev = nextNode;
+
+			prevNode = curNode;
+			curNode = nextNode;
+		}
+
+		this.tail = this.head;
+		this.head = prevNode;
+
+		return this;
+	}
+}
+
+export class CircularLinkedList {
+	constructor(val) {
+		this.head = null;
+		this.tail = null;
+		this.length = 0;
+
+		if (val !== undefined) this.init(val);
+	}
+
+	init(val) {
 		const newNode = new Node(val);
 		newNode.next = newNode;
 		this.head = newNode;
 		this.tail = newNode;
 		this.length++;
+		return this;
 	}
 
 	append(val) {
-		if (this.length === 0) return this.initalize(val);
+		if (this.length === 0) return this.init(val);
 
 		const newNode = new Node(val);
 		newNode.next = this.head;
 		this.tail.next = newNode;
+		this.tail = newNode;
 		this.length++;
+		return this;
 	}
 
 	prepend(val) {
-		if (this.length === 0) return this.initalize(val);
+		if (this.length === 0) return this.init(val);
 
 		const newNode = new Node(val);
 		newNode.next = this.head;
 		this.tail.next = newNode;
 		this.head = newNode;
 		this.length++;
+		return this;
+	}
+
+	toArray() {
+		const arr = [];
+
+		let curNode = this.head;
+
+		do {
+			arr.push(curNode.val);
+			curNode = curNode.next;
+		} while (curNode !== this.head);
+
+		return arr;
+	}
+
+	traverseToIndex(index) {
+		if (index < 0) return "Index must be greater or equal to zero";
+
+		let counter = 0;
+		let curNode = this.head;
+
+		while (counter !== index) {
+			curNode = curNode.next;
+			counter++;
+		}
+		return curNode;
+	}
+
+	insert(val, index) {
+		if (typeof index !== "number") return "Index should be a number";
+		if (index < 0) return "Index should be greater or equal to zero";
+		if (index === 0) return this.prepend(val);
+		if (index >= this.length) return this.append(val);
+
+		const newNode = new Node(val);
+
+		const preIdx = this.traverseToIndex(index - 1);
+		const targetIdx = preIdx.next;
+
+		preIdx.next = newNode;
+		newNode.next = targetIdx;
+
+		this.length++;
+		return this;
+	}
+
+	deleteHead() {
+		if (this.length === 0) return "List is empty";
+
+		const headVal = this.head.val;
+
+		if (this.length === 1) {
+			this.head = null;
+			this.tail = null;
+		} else {
+			const newHead = this.head.next;
+			this.tail.next = newHead;
+			this.head = newHead;
+		}
+
+		this.length--;
+		return headVal;
+	}
+
+	deleteTail() {
+		if (this.length === 0) return "List is empty";
+
+		const tailVal = this.tail.val;
+
+		if (this.length === 1) {
+			this.head = null;
+			this.tail = null;
+		} else {
+			const newTail = this.traverseToIndex(this.length - 2);
+			newTail.next = this.head;
+			this.tail = newTail;
+		}
+
+		this.length--;
+		return tailVal;
+	}
+
+	delete(index) {
+		if (typeof index !== "number") return "Index should be a number";
+		if (index < 0) return "Index should be 0 or greater";
+
+		if (index === 0) return this.deleteHead();
+		if (index >= this.length) return this.deleteTail();
+
+		const preIdx = this.traverseToIndex(index - 1);
+		const targetIdx = preIdx.next;
+		const targetVal = targetIdx.val;
+		preIdx.next = targetIdx.next;
+		this.length--;
+		return targetVal;
+	}
+
+	reverse() {
+		if (this.length <= 1) return;
+
+		let currentNode = this.head;
+		let previousNode = null;
+		let nextNode = null;
+
+		do {
+			nextNode = currentNode.next;
+			currentNode.next = previousNode;
+			previousNode = currentNode;
+			currentNode = nextNode;
+		} while (currentNode !== this.head);
+
+		this.head.next = previousNode;
+		this.head = previousNode;
+
+		return this;
+	}
+}
+
+export class CircularDoublyLinkedList {
+	constructor(val) {
+		this.head = null;
+		this.tail = null;
+		this.length = 0;
+
+		if (val !== undefined) this.init(val);
+	}
+
+	init(val) {
+		const newNode = new Node(val);
+		newNode.next = newNode;
+		newNode.prev = newNode;
+		this.head = this.tail = newNode;
+		this.length = 1;
+		return this;
+	}
+
+	append(val) {
+		if (this.length === 0) return this.init(val);
+
+		const newNode = new Node(val);
+		this.tail.next = newNode;
+		newNode.prev = this.tail;
+		newNode.next = this.head;
+		this.head.prev = newNode;
+		this.tail = newNode;
+		this.length++;
+		return this;
+	}
+
+	prepend(val) {
+		if (this.length === 0) return this.init(val);
+
+		const newNode = new Node(val);
+		this.head.prev = newNode;
+		newNode.next = this.head;
+		newNode.prev = this.tail;
+		this.tail.next = newNode;
+		this.head = newNode;
+		this.length++;
+		return this;
+	}
+
+	toArray() {
+		const arr = [];
+		let curNode = this.head;
+
+		do {
+			arr.push(curNode.val);
+			curNode = curNode.next;
+		} while (curNode !== this.head);
+
+		return arr;
+	}
+
+	traverseToIndex(index) {
+		if (typeof index !== "number") return "Index should be a number";
+		if (index >= this.length) index = index % this.length;
+		if (index < -this.length) index = index % -this.length;
+		if (index === 0) return this.head;
+
+		let counter;
+		let curNode;
+		if (index > 0) {
+			curNode = this.head;
+			counter = 0;
+
+			while (counter !== index) {
+				curNode = curNode.next;
+				counter++;
+			}
+		} else {
+			// Reverse traversal
+			curNode = this.tail;
+			counter = index + 1;
+
+			while (counter !== 0) {
+				curNode = curNode.prev;
+				counter++;
+			}
+		}
+		return curNode;
+	}
+
+	insert(index, value) {
+		if (typeof index !== "number") return "Index should be a number";
+		if (index === 0) return this.prepend(value);
+		if (index < 0) return "Index should be bigger than zero";
+		if (index >= this.length) return this.append(value);
+
+		const newNode = new Node(value);
+		const preIdx = this.traverseToIndex(index - 1);
+		const targetIdx = preIdx.next;
+		preIdx.next = newNode;
+		newNode.prev = preIdx;
+		newNode.next = targetIdx;
+		targetIdx.prev = newNode;
+		this.length++;
+		return this;
+	}
+
+	deleteHead() {
+		if (this.length === 0) return null;
+
+		const headVal = this.head.val;
+		if (this.length === 1) {
+			this.head = null;
+			this.tail = null;
+		} else {
+			const newHead = this.head.next;
+			this.head = newHead;
+			this.tail.next = this.head;
+			this.head.prev = this.tail;
+		}
+		this.length--;
+		return headVal;
+	}
+
+	deleteTail() {
+		if (this.length === 0) return null;
+
+		const tailVal = this.tail.value;
+		if (this.length === 1) {
+			this.head = null;
+			this.tail = null;
+			this.prev = null;
+		} else {
+			const newTail = this.tail.prev;
+			newTail.next = this.head;
+			this.head.prev = newTail;
+			this.tail = newTail;
+		}
+		this.length--;
+		return tailVal;
+	}
+
+	delete(index) {
+		if (typeof index !== "number") return "Index should be a number";
+		if (this.length === 0) return "List is empty";
+		if (index < 0) return `Index should be zero or greater`;
+
+		if (index === 0 || this.length === 1) return this.deleteHead();
+		if (index >= this.length - 1) this.deleteTail();
+
+		const preIdx = this.traverseToIndex(index - 1);
+		const targetIdx = preIdx.next;
+		const targetVal = targetIdx.value;
+		const nextIdx = targetIdx.next;
+		preIdx.next = nextIdx;
+		nextIdx.prev = preIdx;
+		this.length--;
+		return targetVal;
+	}
+
+	reverse() {
+		if (this.length <= 1) return;
+
+		let currentNode = this.head;
+		let previousNode = null;
+		let nextNode = null;
+		do {
+			nextNode = currentNode.next;
+			previousNode = currentNode.prev;
+
+			currentNode.next = previousNode;
+			currentNode.prev = nextNode;
+
+			previousNode = currentNode;
+			currentNode = nextNode;
+		} while (currentNode !== this.head);
+
+		this.tail = this.head;
+		this.head = previousNode;
+		return this;
 	}
 }
