@@ -30,15 +30,10 @@ function marbleMania(numElfs, numMarbles) {
 	for (let i = 1; i <= numMarbles; i++) {
 		if (i % 23 === 0) {
 			curMarble = curMarble.prev.prev.prev.prev.prev.prev;
-			// console.log(curMarble);
-			elfs[curElf] += i + curMarble.prev.val;
-
+			elfs[(i % numElfs) + 1] += i + curMarble.prev.val;
 			curMarble.prev.prev.next = curMarble;
 			curMarble.prev = curMarble.prev.prev;
-		} else {
-			curMarble = addAfter(i, curMarble.next);
-		}
-		curElf = (curElf % numElfs) + 1;
+		} else curMarble = addAfter(i, curMarble.next);
 	}
 	return Math.max(...Object.values(elfs));
 }
