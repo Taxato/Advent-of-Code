@@ -997,13 +997,13 @@ export class CircularDoublyLinkedList {
 		return curNode;
 	}
 
-	insert(index, value) {
+	insert(val, index) {
 		if (typeof index !== "number") return "Index should be a number";
-		if (index === 0) return this.prepend(value);
+		if (index === 0) return this.prepend(val);
 		if (index < 0) return "Index should be bigger than zero";
-		if (index >= this.length) return this.append(value);
+		if (index >= this.length) return this.append(val);
 
-		const newNode = new Node(value);
+		const newNode = new Node(val);
 		const preIdx = this.traverseToIndex(index - 1);
 		const targetIdx = preIdx.next;
 		preIdx.next = newNode;
@@ -1052,14 +1052,14 @@ export class CircularDoublyLinkedList {
 	delete(index) {
 		if (typeof index !== "number") return "Index should be a number";
 		if (this.length === 0) return "List is empty";
-		if (index < 0) return `Index should be zero or greater`;
+		// if (index < 0) return `Index should be zero or greater`;
 
 		if (index === 0 || this.length === 1) return this.deleteHead();
 		if (index >= this.length - 1) this.deleteTail();
 
 		const preIdx = this.traverseToIndex(index - 1);
 		const targetIdx = preIdx.next;
-		const targetVal = targetIdx.value;
+		const targetVal = targetIdx.val;
 		const nextIdx = targetIdx.next;
 		preIdx.next = nextIdx;
 		nextIdx.prev = preIdx;
