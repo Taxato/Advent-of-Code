@@ -56,7 +56,6 @@ function numSolutions(springs, counts) {
 			!/\./.test(springs.substring(0, count)) &&
 			(springs.length === count || springs.charAt(count) !== "#")
 		) {
-			// console.log(springs, remCounts);
 			remSprings = remSprings.slice(count);
 			remCounts = remCounts.slice(1);
 			res = numSolutions(remSprings, remCounts);
