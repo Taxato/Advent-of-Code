@@ -5,62 +5,73 @@ const startTime = process.hrtime();
 const input = readFileSync("./day14input.txt", { encoding: "utf8" });
 const test = readFileSync("./day14test.txt", { encoding: "utf8" });
 
-function partOne(input) {
-	input = input.split("\n").map(l => l.split(""));
-	const grid = create2DArr(input.length, input.length);
+function key(grid) {
+	return JSON.stringify(grid);
+}
 
-	loop2DArr(grid, (col, row) => {
-		grid[col][row] = input[row][col];
-	});
+function load(grid) {
+	let load = 0;
+	for (let y = 0; y < grid.length; y++) {
+		for (let x = 0; x < grid.length; x++) {
+			if (grid[x][y] === "O") load += grid.length - y;
+		}
+	}
+	return load;
+}
 
-	const key = grid => grid.flat().join("");
+function move(grid, dir) {
+	const dX = [0, -1, 0, 1][dir];
+	const dY = [-1, 0, 1, 0][dir];
 
 	let prevKey = key(grid);
-
 	while (true) {
-		moveNorth();
-		const newKey = key(grid);
-		if (newKey === prevKey) break;
-		prevKey = newKey;
-	}
-	// log2DArr(grid, true);
-	return load(grid);
-	function moveNorth() {
-		for (let y = 1; y < grid.length; y++) {
+		for (let y = 0; y < grid.length; y++) {
 			for (let x = 0; x < grid.length; x++) {
-				const char = grid[x][y];
-				const above = grid[x][y - 1];
+				if (
+					x + dX < 0 ||
+					x + dX >= grid.length ||
+					y + dY < 0 ||
+					y + dY >= grid.length
+				)
+					continue;
 
-				if (char === "O" && above === ".") {
-					grid[x][y - 1] = "O";
+				if (grid[x][y] === "O" && grid[x + dX][y + dY] === ".") {
+					grid[x + dX][y + dY] = "O";
 					grid[x][y] = ".";
 				}
 			}
 		}
-	}
-
-	function load() {
-		let load = 0;
-		for (let y = 0; y < grid.length; y++) {
-			for (let x = 0; x < grid.length; x++) {
-				if (grid[x][y] === "O") load += grid.length - y;
-			}
-		}
-		return load;
+		const newKey = key(grid);
+		if (newKey === prevKey) break;
+		prevKey = newKey;
 	}
 }
 
-function partTwo(input) {
+function createGrid(input) {
 	input = input.split("\n").map(l => l.split(""));
 	const grid = create2DArr(input.length, input.length);
 
 	loop2DArr(grid, (col, row) => {
 		grid[col][row] = input[row][col];
 	});
+	return grid;
+}
 
-	function key() {
-		return JSON.stringify(grid);
+function partOne(input) {
+	const grid = createGrid(input);
+	let prevKey = key(grid);
+
+	while (true) {
+		move(grid, 0);
+		const newKey = key(grid);
+		if (newKey === prevKey) break;
+		prevKey = newKey;
 	}
+	return load(grid);
+}
+
+function partTwo(input) {
+	const grid = createGrid(input);
 
 	const cache = new Set();
 
@@ -68,13 +79,11 @@ function partTwo(input) {
 	let loopSize = 0;
 	let i = 0;
 	for (i; i < 1e9; i++) {
-		const k = key();
+		const k = key(grid);
 		if (cache.has(k)) {
 			if (k == loop) break;
 			if (!loopSize) loop = k;
 			loopSize++;
-			// continue;
-			// console.log(k);
 		}
 		cache.add(k);
 		cycle();
@@ -82,105 +91,14 @@ function partTwo(input) {
 	for (let j = 0; j < (1e9 - i) % loopSize; j++) {
 		cycle();
 	}
-	return load();
+	return load(grid);
 
 	function cycle() {
-		moveNorth();
-		moveWest();
-		moveSouth();
-		moveEast();
-	}
-
-	function moveNorth() {
-		let prevKey = key();
-		while (true) {
-			for (let y = 1; y < grid.length; y++) {
-				for (let x = 0; x < grid.length; x++) {
-					const char = grid[x][y];
-					const above = grid[x][y - 1];
-
-					if (char === "O" && above === ".") {
-						grid[x][y - 1] = "O";
-						grid[x][y] = ".";
-					}
-				}
-			}
-			const newKey = key();
-			if (newKey === prevKey) break;
-			prevKey = newKey;
-		}
-	}
-	function moveEast() {
-		let prevKey = key();
-		while (true) {
-			for (let y = 0; y < grid.length; y++) {
-				for (let x = 0; x < grid.length - 1; x++) {
-					const char = grid[x][y];
-					const right = grid[x + 1][y];
-
-					if (char === "O" && right === ".") {
-						grid[x + 1][y] = "O";
-						grid[x][y] = ".";
-					}
-				}
-			}
-			const newKey = key();
-			if (newKey === prevKey) break;
-			prevKey = newKey;
-		}
-	}
-	function moveSouth() {
-		let prevKey = key();
-		while (true) {
-			for (let y = 0; y < grid.length - 1; y++) {
-				for (let x = 0; x < grid.length; x++) {
-					const char = grid[x][y];
-					const below = grid[x][y + 1];
-
-					if (char === "O" && below === ".") {
-						grid[x][y + 1] = "O";
-						grid[x][y] = ".";
-					}
-				}
-			}
-			const newKey = key();
-			if (newKey === prevKey) break;
-			prevKey = newKey;
-		}
-	}
-
-	function moveWest() {
-		let prevKey = key();
-		while (true) {
-			for (let y = 0; y < grid.length; y++) {
-				for (let x = 1; x < grid.length; x++) {
-					const char = grid[x][y];
-					const left = grid[x - 1][y];
-
-					if (char === "O" && left === ".") {
-						grid[x - 1][y] = "O";
-						grid[x][y] = ".";
-					}
-				}
-			}
-			const newKey = key();
-			if (newKey === prevKey) break;
-			prevKey = newKey;
-		}
-	}
-
-	function load() {
-		let load = 0;
-		for (let y = 0; y < grid.length; y++) {
-			for (let x = 0; x < grid.length; x++) {
-				if (grid[x][y] === "O") load += grid.length - y;
-			}
-		}
-		return load;
+		for (let i = 0; i < 4; i++) move(grid, i);
 	}
 }
 
-// console.log(partOne(input));
+console.log(partOne(input));
 console.log(partTwo(input));
 
 time(startTime);
