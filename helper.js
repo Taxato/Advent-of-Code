@@ -42,6 +42,15 @@ export function time(start) {
 	console.log(`Execution time: ${end[0] * 1000 + end[1] / 1000000}ms`);
 }
 
+export function gridFromText(text) {
+	let data = text.split("\n").map(l => l.split(""));
+	const grid = create2DArr(data.length, data.length);
+	loop2DArr(grid, (col, row) => {
+		grid[col][row] = +data[row][col];
+	});
+	return grid;
+}
+
 export function create2DArr(cols, rows, fill = 0) {
 	return Array.from({ length: cols }, () =>
 		Array.from({ length: rows }, () => fill)
@@ -1087,5 +1096,351 @@ export class CircularDoublyLinkedList {
 		this.tail = this.head;
 		this.head = previousNode;
 		return this;
+	}
+}
+
+export class Heap {
+	constructor(comparator) {
+		this.heap = [];
+
+		this.comparator = comparator || ((a, b) => a - b);
+	}
+
+	get size() {
+		return this.heap.length;
+	}
+
+	get isEmpty() {
+		return this.size === 0;
+	}
+
+	peek() {
+		return this.heap[0];
+	}
+
+	insert(val) {
+		this.heap.push(val);
+
+		this.heapifyUp();
+	}
+
+	delete() {
+		if (this.isEmpty) return null;
+
+		const poppedVal = this.peek();
+
+		const bottom = this.size - 1;
+		if (bottom > 0) this.swap(0, bottom);
+
+		this.heapifyDown();
+
+		return poppedVal;
+	}
+
+	parentIndex(i) {
+		return Math.floor((i - 1) / 2);
+	}
+
+	parentVal(i) {
+		return i < this.size && this.parentIndex(i) >= 0
+			? this.heap[this.parentIndex(i)]
+			: undefined;
+	}
+
+	leftChildIndex(i) {
+		return 2 * i + 1;
+	}
+
+	leftChildVal(i) {
+		return this.hasLeftChild(i)
+			? this.heap[this.leftChildIndex]
+			: undefined;
+	}
+
+	hasLeftChild(i) {
+		return this.leftChildIndex(i) < this.size;
+	}
+
+	rightChildIndex(i) {
+		return 2 * i + 2;
+	}
+
+	rightChildVal(i) {
+		return this.hasRightChild(i)
+			? this.heap[this.rightChildIndex(i)]
+			: undefined;
+	}
+
+	hasRightChild(i) {
+		return this.rightChildIndex(i) < this.size;
+	}
+
+	swap(i, j) {
+		[this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];
+	}
+
+	heapifyUp() {
+		let nodeIdx = this.size - 1;
+
+		while (
+			nodeIdx > 0 &&
+			this.comparator(this.parentVal(nodeIdx), this.heap[nodeIdx]) > 0
+		) {
+			this.swap(nodeIdx, this.parentIndex(nodeIdx));
+			nodeIdx = this.parentIndex(nodeIdx);
+		}
+	}
+
+	heapifyDown() {
+		let nodeIdx = 0;
+
+		while (this.hasLeftChild(nodeIdx)) {
+			let smallerChildIdx = this.leftChildIndex(nodeIdx);
+
+			if (
+				this.hasRightChild(nodeIdx) &&
+				this.comparator(
+					this.rightChildVal(nodeIdx),
+					this.leftChildVal(nodeIdx)
+				) < 0
+			) {
+				smallerChildIdx = this.rightChildIndex(nodeIdx);
+			}
+
+			if (
+				this.comparator(
+					this.heap[nodeIdx],
+					this.heap[smallerChildIdx]
+				) <= 0
+			) {
+				break;
+			}
+
+			this.swap(nodeIdx, smallerChildIdx);
+			nodeIdx = smallerChildIdx;
+		}
+	}
+
+	displayHeap() {
+		let res = [];
+		let levelCount = 1;
+		let curLevel = [];
+
+		for (let i = 0; i < this.size; i++) {
+			curLevel.push(this.heap[i]);
+
+			if (curLevel.length === levelCount) {
+				res.push(curLevel);
+				curLevel = [];
+				levelCount *= 2;
+			}
+		}
+
+		if (curLevel.length > 0) {
+			res.push(curLevel);
+		}
+
+		return res;
+	}
+}
+
+export class MinHeap extends Heap {
+	constructor() {
+		super((a, b) => a - b);
+	}
+}
+
+export class MaxHeap extends Heap {
+	constructor() {
+		super((a, b) => b - a);
+	}
+}
+
+export class PriorityQueue {
+	constructor(comparator) {
+		this.heap = [];
+
+		this.comparator = comparator || ((a, b) => a - b);
+	}
+
+	get size() {
+		return this.heap.length;
+	}
+
+	get isEmpty() {
+		return this.size === 0;
+	}
+
+	peek() {
+		return this.heap[0] ? this.heap[0].val : null;
+	}
+
+	enqueue(val, priority) {
+		this.heap.push({ val, priority });
+		this._heapifyUp();
+	}
+
+	dequeue() {
+		if (this.isEmpty) return null;
+
+		const poppedVal = this.peek();
+
+		const bottom = this.size - 1;
+		if (bottom > 0) this._swap(0, bottom);
+
+		this.heap.pop();
+		this._heapifyDown();
+
+		return poppedVal;
+	}
+
+	updatePriority(val, newPriority, equalityFn) {
+		const index = this.heap.findIndex(item => equalityFn(item.val, val));
+
+		if (index === -1) return;
+
+		const oldPriority = this.heap[index].priority;
+		this.heap[index].priority = newPriority;
+
+		if (this.comparator(newPriority, oldPriority) < 0)
+			this._heapifyUpFromIndex(index);
+		else this._heapifyDownFromIndex(index);
+	}
+
+	search(val, equalityFn) {
+		const item = this.heap.find(item => equalityFn(item.val, val));
+		return item || null;
+	}
+
+	toSortedArray() {
+		const sortedList = [...this.heap];
+		return sortedList.sort((a, b) =>
+			this.comparator(a.priority, b.priority)
+		);
+	}
+
+	_parentIndex(index) {
+		return Math.floor((index - 1) / 2);
+	}
+
+	_leftChildIndex(index) {
+		return 2 * index + 1;
+	}
+
+	_rightChildIndex(index) {
+		return 2 * index + 2;
+	}
+
+	_hasLeftChild(index) {
+		return this._leftChildIndex(index) < this.size;
+	}
+
+	_hasRightChild(index) {
+		return this._rightChildIndex(index) < this.size;
+	}
+
+	_swap(i, j) {
+		[this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];
+	}
+
+	_heapifyUp() {
+		let nodeIdx = this.size - 1;
+
+		while (
+			nodeIdx > 0 &&
+			this.comparator(
+				this.heap[nodeIdx].priority,
+				this.heap[this._parentIndex(nodeIdx)].priority
+			) < 0
+		) {
+			this._swap(nodeIdx, this._parentIndex(nodeIdx));
+			nodeIdx = this._parentIndex(nodeIdx);
+		}
+	}
+
+	_heapifyDown() {
+		let nodeIdx = 0;
+
+		while (this._hasLeftChild(nodeIdx)) {
+			let smallerChildIdx = this._leftChildIndex(nodeIdx);
+
+			if (
+				this._hasRightChild(nodeIdx) &&
+				this.comparator(
+					this.heap[this._rightChildIndex(nodeIdx)].priority,
+					this.heap[smallerChildIdx].priority
+				) < 0
+			) {
+				smallerChildIdx = this._rightChildIndex(nodeIdx);
+			}
+
+			if (
+				this.comparator(
+					this.heap[nodeIdx].priority,
+					this.heap[smallerChildIdx].priority
+				) <= 0
+			) {
+				break;
+			}
+
+			this._swap(nodeIdx, smallerChildIdx);
+			nodeIdx = smallerChildIdx;
+		}
+	}
+
+	_heapifyUpFromIndex(index) {
+		let currentIndex = index;
+
+		while (currentIndex > 0) {
+			let parentIndex = this._parentIndex(currentIndex);
+
+			if (
+				this.comparator(
+					this.heap[currentIndex],
+					this.heap[parentIndex]
+				) < 0
+			) {
+				this._swap(currentIndex, parentIndex);
+				currentIndex = parentIndex;
+			} else {
+				break;
+			}
+		}
+	}
+
+	_heapifyDownFromIndex(index) {
+		let currentIndex = index;
+
+		while (this._hasLeftChild(currentIndex)) {
+			let smallerChildIndex = this._leftChildIndex(currentIndex);
+
+			if (
+				this._hasRightChild(currentIndex) &&
+				this.comparator(
+					this.heap[this._rightChildIndex(currentIndex)],
+					this.heap[smallerChildIndex]
+				) < 0
+			) {
+				smallerChildIndex = this._rightChildIndex(currentIndex);
+			}
+
+			if (
+				this.comparator(
+					this.heap[currentIndex],
+					this.heap[smallerChildIndex]
+				) <= 0
+			) {
+				break;
+			}
+
+			this._swap(currentIndex, smallerChildIndex);
+			currentIndex = smallerChildIndex;
+		}
+	}
+}
+
+export class MaxPriorityQueue extends PriorityQueue {
+	constructor() {
+		super((a, b) => b - a);
 	}
 }
