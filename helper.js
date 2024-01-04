@@ -38,8 +38,8 @@ export function timeUsed(start, finish) {
 }
 
 export function time(start) {
-	const end = process.hrtime(start);
-	console.log(`Execution time: ${end[0] * 1000 + end[1] / 1000000}ms`);
+	const t = process.hrtime(start);
+	console.log(`Execution time: ${t[0] * 1000 + t[1] / 1000000}ms`);
 }
 
 export function gridFromText(text) {
