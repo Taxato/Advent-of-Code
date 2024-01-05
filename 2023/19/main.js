@@ -1,95 +1,120 @@
 import { readFileSync } from "fs";
-import { sumArr, time } from "../../helper.js";
+import { arrProduct, sumArr, time } from "../../helper.js";
 const startTime = process.hrtime();
 
 const input = readFileSync("./input.txt", { encoding: "utf8" });
 const test = readFileSync("./test.txt", { encoding: "utf8" });
+let data = input;
+data = data.split("\n\n");
 
-const data = test;
+function parseWorkflow(rawStr, builder) {
+	const [_, key, rawFilters, fallback] = rawStr.match(/(.*){(.*),(.*)}/);
+	return [key, builder(rawFilters, fallback)];
+}
 
-const [workflows, parts] = data.split("\n\n").map(p => p.split("\n"));
+function extractFilterComponents(str) {
+	const category = str.charAt(0);
+	const op = str.charAt(1);
+	const [valStr, dst] = str.slice(2).split(":");
+	return { category, op, val: +valStr, dst };
+}
 
-const wfs = {};
-for (const wf of workflows) {
-	let [_, name, rules] = wf.match(/(\w+)\{(.+)\}/);
-	rules = rules.split(",");
-	const finalOut = rules.pop();
-	rules = rules.map(r => {
-		const [exp, dst] = r.split(":");
-		const op = exp.match(/<|>/)[0];
-		const category = exp.charAt(0);
-		const checkVal = +exp.match(/\d+/)[0];
-		return { op, category, checkVal, dst };
-	});
-
-	wfs[name] = {
-		rules,
-		finalOut,
+function buildWorkflow(rawFilters, fallback) {
+	return function _getNextDst(part) {
+		for (const rawFilter of rawFilters.split(",")) {
+			const { category, op, val, dst } =
+				extractFilterComponents(rawFilter);
+			if (eval?.(`${part[category]}${op}${val}`)) return dst;
+		}
+		return fallback;
 	};
 }
 
-function partOne() {
-	const acceptedParts = [];
+function buildCountingWorkflow(rawFilters, fallback) {
+	return function _getNextDst(part) {
+		const ranges = [];
 
-	parts: for (let part of parts) {
-		const [x, m, a, s] = part.match(/(\d)+/g).map(Number);
-		part = { x, m, a, s };
-		let curWf = wfs["in"];
+		for (const rawFilter of rawFilters.split(",")) {
+			const { category, op, val, dst } =
+				extractFilterComponents(rawFilter);
 
-		rules: while (true) {
-			let res;
-			for (const rule of curWf.rules) {
-				const { op, category: cat, checkVal, dst } = rule;
-				if (op === "<") {
-					res = part[cat] < checkVal;
-				} else if (op === ">") {
-					res = part[cat] > checkVal;
-				} else console.log("ERROR, INVALID OPERATOR");
-				if (res === true) {
-					switch (dst) {
-						case "A":
-							acceptedParts.push(part);
-							continue parts;
-						case "R":
-							continue parts;
-						default:
-							curWf = wfs[dst];
-							continue rules;
-					}
-				}
-			}
-			switch (curWf.finalOut) {
-				case "A":
-					acceptedParts.push(part);
-					continue parts;
-				case "R":
-					continue parts;
-				default:
-					curWf = wfs[curWf.finalOut];
-					continue rules;
-			}
+			let keep, send;
+			if (op === ">") [keep, send] = splitRange(part[category], val + 1);
+			else [send, keep] = splitRange(part[category], val);
+
+			const cloneOne = JSON.parse(JSON.stringify(part));
+			const cloneTwo = JSON.parse(JSON.stringify(part));
+			cloneOne[category] = send;
+			cloneTwo[category] = keep;
+			ranges.push({ dst, part: cloneOne });
+			part = cloneTwo;
 		}
+
+		return ranges.concat({ dst: fallback, part });
+	};
+}
+
+function parseParts(block) {
+	return block.split("\n").map(p => {
+		const [x, m, a, s] = p.match(/\d+/g).map(Number);
+		return { x, m, a, s };
+	});
+}
+
+function range(min, max) {
+	return { start: min, stop: max, len: max - min };
+}
+
+function splitRange(r, val) {
+	return [range(r.start, val), range(val, r.stop)];
+}
+
+function partOne() {
+	const [workflowsBlock, partsBlock] = data;
+
+	const wfs = Object.fromEntries(
+		workflowsBlock.split("\n").map(wf => parseWorkflow(wf, buildWorkflow))
+	);
+	const parts = parseParts(partsBlock);
+
+	function scorePart(part, wfKey) {
+		if (wfKey === "R") return 0;
+		if (wfKey === "A") return sumArr(Object.values(part));
+
+		return scorePart(part, wfs[wfKey](part));
 	}
 
-	return acceptedParts.reduce(
-		(sum, cur) => sum + sumArr(Object.values(cur)),
-		0
-	);
+	return sumArr(parts.map(p => scorePart(p, "in")));
 }
 
 function partTwo() {
-	function splitRange(range, val) {
-		const { min, max } = range;
-		return [
-			{ min, max: val - 1 },
-			{ min: val, max },
-		];
+	const workflowsBlock = data[0];
+	const wfs = Object.fromEntries(
+		workflowsBlock
+			.split("\n")
+			.map(wf => parseWorkflow(wf, buildCountingWorkflow))
+	);
+
+	function scoreWorkflow(wfKey, part) {
+		if (wfKey === "R") return 0;
+		if (wfKey === "A")
+			return arrProduct(Object.values(part).map(c => c.len));
+
+		return sumArr(
+			wfs[wfKey](part).map(res => scoreWorkflow(res.dst, res.part))
+		);
 	}
+
+	return scoreWorkflow(
+		"in",
+		Object.fromEntries("xmas".split("").map(l => [l, range(1, 4001)]))
+	);
 }
 
 console.log(partOne());
 console.log(partTwo());
 
-// 167409079868000 -- correct answer for part two test input
-
+// 167409079868000 TEST PART TWO
+// 167409079868000 MY TEST OUTPUT
+// 4231424000000000000
 time(startTime);
