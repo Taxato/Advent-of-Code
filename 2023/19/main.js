@@ -114,7 +114,4 @@ function partTwo() {
 console.log(partOne());
 console.log(partTwo());
 
-// 167409079868000 TEST PART TWO
-// 167409079868000 MY TEST OUTPUT
-// 4231424000000000000
 time(startTime);
