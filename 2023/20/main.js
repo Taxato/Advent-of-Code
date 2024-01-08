@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { time } from "../../helper.js";
+import { lcm, time } from "../../helper.js";
 const startTime = process.hrtime();
 
 const input = readFileSync("./input.txt", { encoding: "utf8" });
@@ -40,6 +40,7 @@ class Module {
 		}
 
 		this.srcs = [];
+		this.highPulseSent = false;
 	}
 
 	recievePulse(from, amp) {
@@ -63,6 +64,14 @@ class Module {
 	}
 
 	emitPulse(amp) {
+		if (
+			this.machine.buttonPresses !== 0 &&
+			amp === HIGH &&
+			!this.highPulseSent
+		) {
+			this.highPulseSent = this.machine.buttonPresses;
+		}
+
 		if (amp === HIGH) this.machine.highPulses += this.dsts.length;
 		else this.machine.lowPulses += this.dsts.length;
 
@@ -99,17 +108,14 @@ class Machine {
 
 		this.broadcaster = this.modules.find(m => m.type === "broadcaster");
 		this.pulseQueue = [];
-		this.buttonPresses;
+		this.buttonPresses = 0;
 		this.lowPulses = 0;
 		this.highPulses = 0;
 	}
 
 	pushButton(numTimes = 1) {
-		for (
-			this.buttonPresses = 0;
-			this.buttonPresses < numTimes;
-			this.buttonPresses++
-		) {
+		for (let i = 0; i < numTimes; i++) {
+			this.buttonPresses++;
 			this.broadcaster.recievePulse(LOW);
 			this.run();
 		}
@@ -148,9 +154,10 @@ class Machine {
 		this.lowPulses = 0;
 		this.highPulses = 0;
 		this.modules.forEach(m => {
-			if (m.type === "conjunct")
+			if (m.type === "conjunct") {
 				Object.keys(m.inputs).forEach(k => (m.inputs[k] = false));
-			else if (m.type === "flipFlop") m.state = false;
+				m.highPulseSent = false;
+			} else if (m.type === "flipFlop") m.state = false;
 		});
 	}
 }
@@ -162,5 +169,16 @@ console.log("Part one:", machine.pushButton(1000));
 machine.reset();
 
 const output = machine.modules.find(m => m.name === "rx");
+const transmitter = machine.modules.find(m => m.name === output.srcs[0]);
+const transInputs = Object.keys(transmitter.inputs).map(name =>
+	machine.modules.find(m => m.name === name)
+);
+
+while (true) {
+	machine.pushButton();
+	if (transInputs.every(tIn => tIn.highPulseSent !== false)) break;
+}
+const pulsesSent = transInputs.map(tIn => tIn.highPulseSent);
+console.log("Part two:", lcm(...pulsesSent));
 
 time(startTime);
