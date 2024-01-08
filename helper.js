@@ -252,6 +252,16 @@ export function knotHash(input) {
 	return denseHash.map(num => num.toString(16).padStart(2, "0")).join("");
 }
 
+const _gcd = (a, b) => (b === 0 ? a : _gcd(b, a % b));
+export function gcd(...arr) {
+	return arr.reduce((a, b) => _gcd(a, b));
+}
+
+const _lcm = (a, b) => (a * b) / _gcd(a, b);
+export function lcm(...arr) {
+	return arr.reduce((a, b) => _lcm(a, b));
+}
+
 export class GridState {
 	constructor(
 		grid,
