@@ -33,7 +33,7 @@ let inputData = await (
 	})
 ).text();
 
-writeFileSync(`./${day}/input.txt`, inputData);
+writeFileSync(`./${day}/input.txt`, inputData.trimEnd());
 writeFileSync(`./${day}/test.txt`, "");
 
 rl.close();

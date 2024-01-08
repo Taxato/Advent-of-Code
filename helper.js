@@ -44,9 +44,9 @@ export function time(start) {
 
 export function gridFromText(text) {
 	let data = text.split("\n").map(l => l.split(""));
-	const grid = create2DArr(data.length, data.length);
+	const grid = create2DArr(data.length, data[0].length);
 	loop2DArr(grid, (col, row) => {
-		grid[col][row] = +data[row][col];
+		grid[col][row] = data[row][col];
 	});
 	return grid;
 }
